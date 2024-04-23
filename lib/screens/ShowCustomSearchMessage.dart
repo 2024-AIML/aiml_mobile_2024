@@ -1,12 +1,16 @@
-import 'package:flutter/material.dart';
-import '../service/HttpServiceForAPI.dart'; // HttpService를 불러옵니다.
+// ShowCustomSearchMessage.dart
 
-class MyHomePage extends StatefulWidget {
+import 'package:flutter/material.dart';
+import '../widget/CommonScaffold.dart'; // CommonScaffold를 import
+import '../service/HttpServiceForAPI.dart'; // API 호출을 위한 HttpService import
+
+class ShowCustomSearchMessage extends StatefulWidget {
+  const ShowCustomSearchMessage({Key? key}) : super(key: key);
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _ShowCustomSearchMessageState createState() => _ShowCustomSearchMessageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _ShowCustomSearchMessageState extends State<ShowCustomSearchMessage> {
   List<Message> _messages = [];
   List<Message> _filteredMessages = [];
   TextEditingController _searchController = TextEditingController();
@@ -19,32 +23,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _fetchData() async {
     List<Message> messages = await HttpService.fetchData();
-
     setState(() {
       _messages = messages;
-      _filteredMessages = messages; // 처음에는 필터링 되지 않은 모든 메시지
+      _filteredMessages = messages;
     });
   }
 
-  void _filterMessages(String query){
+  void _filterMessages(String query) {
     setState(() {
-      _filteredMessages = _messages
-          .where((message) => message.locationName.toLowerCase().contains(query.toLowerCase()))
-          .toList();
+      _filteredMessages = _messages.where((message) =>
+          message.locationName.toLowerCase().contains(query.toLowerCase())).toList();
     });
   }
 
-  void _search(){
+  void _search() {
     String query = _searchController.text;
     _filterMessages(query);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('재난 안내 문자 목록'),
-      ),
+    return CommonScaffold(
+      title: Text("재난 안전 문자 목록"),
       body: Column(
         children: [
           Padding(
@@ -59,9 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       hintText: '지역 이름을 입력하세요',
                       prefixIcon: Icon(Icons.search),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10.0),
-                        ),
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
                       ),
                     ),
                   ),
@@ -87,7 +85,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       style: TextStyle(fontSize: 14.0),
                     ),
                   ),
-                  elevation: 5,
                 );
               },
             ),
