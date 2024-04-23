@@ -8,8 +8,8 @@ class CommonScaffold extends StatelessWidget {
 
   const CommonScaffold({
     Key? key,
-    required this.body,
     required this.title,
+    required this.body
   }) : super(key: key); // key를 명시하지 않습니다.
 
   @override
