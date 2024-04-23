@@ -44,11 +44,11 @@ class CommonScaffold extends StatelessWidget {
           }
         },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.place), label: 'infra'),
-          BottomNavigationBarItem(icon: Icon(Icons.near_me), label: 'navi'),
-          BottomNavigationBarItem(icon: Icon(Icons.youtube_searched_for), label: 'sear'),
-          BottomNavigationBarItem(icon: Icon(Icons.mode_comment), label: 'mess'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
+          BottomNavigationBarItem(icon: Icon(Icons.place), label: '내 주변'),
+          BottomNavigationBarItem(icon: Icon(Icons.near_me), label: '길 안내'),
+          BottomNavigationBarItem(icon: Icon(Icons.youtube_searched_for), label: '친구 찾기'),
+          BottomNavigationBarItem(icon: Icon(Icons.mode_comment), label: '재난 문자 목록'),
         ],
       ),
     );

@@ -1,5 +1,3 @@
-// ShowCustomSearchMessage.dart
-
 import 'package:flutter/material.dart';
 import '../widget/CommonScaffold.dart'; // CommonScaffold를 import
 import '../service/HttpServiceForAPI.dart'; // API 호출을 위한 HttpService import
