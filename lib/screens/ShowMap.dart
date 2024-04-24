@@ -12,6 +12,9 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   final String apiKey = 'SwigVFb4E6Bw3FBWS0VW6Ht4AKh6iD5RLCNI5HdI';
   Image? mapImage;
+  String? selectedLocation; //  선택된 약국 또는 병원을 저장하기 위한 변수
+  final List<String> select = ['병원', '약국'];
+  final List<String> items = ['거리순', '정확도순'];
 
 
   Future<void> _fetchMapData() async
@@ -22,8 +25,8 @@ class _MapScreenState extends State<MapScreen> {
 
     final headers = {
       'X-NCP-APIGW-API-KEY-ID': cliendID,
-      'X-NCP-APIGW-API-KEY':clientSecret,
-    };    //HTTP 요청 헤더를 추가합니다.
+      'X-NCP-APIGW-API-KEY': clientSecret,
+    }; //HTTP 요청 헤더를 추가합니다.
 
     try {
       final response = await http.get(Uri.parse(apiUrl), headers: headers);
@@ -34,16 +37,19 @@ class _MapScreenState extends State<MapScreen> {
         setState(() {
           mapImage = image;
         });
+
+
+        //약국 위치 표시하는 코드를 여기에 추가
       }
       else {
         throw Exception('Failed to fetch map data');
       }
     }
-    catch (e)
-    {
+    catch (e) {
       print('Error fetching map data: $e');
     }
   }
+
   @override
   void initState() {
     super.initState();
@@ -54,12 +60,67 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Naver Map'),
+        title: Text('Infra Info'),
       ),
-      body: Center(
-        child: mapImage != null
-              ?mapImage
-              :CircularProgressIndicator(), // API 호출 완료를 기다리는 동안 로딩 인디케이터를 표시합니다.
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (mapImage != null)
+            mapImage!,
+          if (mapImage == null)
+            CircularProgressIndicator(),
+          Row(
+            children: [
+              Expanded(
+                child: ListTile(
+                  title: Text('약국'),
+                  leading: Radio<String>(
+                    value: '약국',
+                    groupValue: selectedLocation,
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedLocation = value;
+                      });
+                    },
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListTile(
+                  title: Text('병원'),
+                  leading: Radio<String>(
+                    value: '병원',
+                    groupValue: selectedLocation,
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedLocation = value;
+                      });
+                    },
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    DropdownButton<String>(
+                      value: items.first,
+                      onChanged: (String? newValue) {
+                        // Do something when the value changes
+                      },
+                      items: items.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
