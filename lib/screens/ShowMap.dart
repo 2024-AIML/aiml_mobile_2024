@@ -1,4 +1,5 @@
 import 'dart:async';
+//import 'dart:html';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart'as http;
@@ -7,7 +8,9 @@ import 'package:flutter_naver_map/flutter_naver_map.dart';
 class MapScreen extends StatefulWidget {
   @override
   _MapScreenState createState() => _MapScreenState();
+
 }
+
 
 class _MapScreenState extends State<MapScreen> {
   final String apiKey = 'SwigVFb4E6Bw3FBWS0VW6Ht4AKh6iD5RLCNI5HdI';
@@ -49,6 +52,7 @@ class _MapScreenState extends State<MapScreen> {
       print('Error fetching map data: $e');
     }
   }
+
 
   @override
   void initState() {
@@ -120,6 +124,7 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ],
           ),
+         
         ],
       ),
     );

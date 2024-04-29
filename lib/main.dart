@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: MapScreen(), //  수정된 부분: MapScreen
+
     );
   }
 }
