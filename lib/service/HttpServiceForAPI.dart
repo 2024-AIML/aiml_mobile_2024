@@ -4,11 +4,12 @@ import 'package:http/http.dart' as http;
 class Message{
   final String msg;
   final String locationName;
+  final String create_date;
 
-  Message({required this.msg, required this.locationName});
+  Message({required this.msg, required this.locationName, required this.create_date});
 
   factory Message.fromJson(Map<String, dynamic> json){
-    return Message(msg: json['msg'], locationName: json['location_name'],);
+    return Message(msg: json['msg'], locationName: json['location_name'], create_date: json['create_date']);
   }
 }
 

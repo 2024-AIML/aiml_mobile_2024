@@ -4,6 +4,7 @@ import '../service/HttpServiceForAPI.dart'; // API 호출을 위한 HttpService 
 
 class ShowCustomSearchMessage extends StatefulWidget {
   const ShowCustomSearchMessage({Key? key}) : super(key: key);
+
   @override
   _ShowCustomSearchMessageState createState() => _ShowCustomSearchMessageState();
 }
@@ -72,17 +73,29 @@ class _ShowCustomSearchMessageState extends State<ShowCustomSearchMessage> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: _filteredMessages.length,
+              // itemCount: _filteredMessages.length,
               itemBuilder: (context, index) {
-                return Card(
-                  margin: EdgeInsets.all(10.0),
-                  child: Padding(
-                    padding: EdgeInsets.all(15.0),
-                    child: Text(
-                      _filteredMessages[index].msg,
-                      style: TextStyle(fontSize: 14.0),
+                return Column(
+                  children: [
+                    Text(
+                      textAlign: TextAlign.left,
+                      _filteredMessages[index].create_date,
+                      style: TextStyle(fontSize: 12.0),
                     ),
-                  ),
+
+                    Card(
+                      margin: EdgeInsets.all(10.0),
+                      child: Padding(
+                        padding: EdgeInsets.all(15.0),
+                        child: Text(
+                          _filteredMessages[index].msg,
+                          style: TextStyle(fontSize: 14.0),
+                          // 여기에 Card 내용을 추가할 수 있습니다.
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12.0),
+                  ],
                 );
               },
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import '../widget/CommonScaffold.dart';
 
 
@@ -12,6 +13,14 @@ class _JoinMemberState extends State<JoinMember> {
   String _selectedGender = '남자';
   String _selectedSpecial = '해당 없음';
 
+  TextEditingController nameController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController id1Controller = TextEditingController();
+  TextEditingController id2Controller = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController pwController = TextEditingController();
+  TextEditingController checkController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
@@ -21,22 +30,106 @@ class _JoinMemberState extends State<JoinMember> {
           padding: EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+            children: <Widget>[
+
+              SizedBox(height: 10.0),
+
               fieldTitle('이름'),
-              textFieldHint('이름을 입력하세요'),
-              SizedBox(height: 20.0),
+              SizedBox(
+                width: 25.0,
+                child: TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: "이름을 입력하세요"
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.0),
 
               fieldTitle('이메일'),
-              textFieldHint('이메일을 입력하세요'),
-              SizedBox(height: 20.0),
+              SizedBox(
+                width: 25.0,
+                child: TextField(
+                  controller: phoneController,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: "핸드폰 번호를 입력하세요"
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.0),
+
+              fieldTitle('주민등록번호'),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 25.0,
+                    child: TextField(
+                      controller: id1Controller,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: "생년월일 6자리"
+                      ),
+                    ),
+                  ),
+                  Text(" - "),
+                  SizedBox(
+                    width: 25.0,
+                    child: TextField(
+                      controller: id2Controller,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: "뒷자리 7자리"
+                      ),
+                      obscureText: true,
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 10.0),
+
+              fieldTitle('이메일'),
+              SizedBox(
+                width: 25.0,
+                child: TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: "이메일을 입력하세요"
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.0),
 
               fieldTitle('비밀번호'),
-              textFieldHint('비밀번호를 입력하세요', obscureText: true),
-              SizedBox(height: 20.0),
+              SizedBox(
+                width: 25.0,
+                child: TextField(
+                  controller: pwController,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: "비밀번호를 입력하세요"
+                  ),
+                  obscureText: true,
+                ),
+              ),
+              SizedBox(height: 10.0),
 
               fieldTitle('비밀번호 확인'),
-              textFieldHint('비밀번호를 한 번 더 입력하세요', obscureText: true),
-              SizedBox(height: 20.0),
+              SizedBox(
+                width: 25.0,
+                child: TextField(
+                  controller: checkController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: "비밀번호를 한 번 더 입력하세요"
+                  ),
+                  obscureText: true,
+                ),
+              ),
+              SizedBox(height: 15.0),
 
               Text('성별', style: sectionTitleStyle()),
               genderRadioTile('남자'),
@@ -45,12 +138,12 @@ class _JoinMemberState extends State<JoinMember> {
 
               Text('특이사항', style: sectionTitleStyle()),
               specialRadioTile('해당 없음'),
-              specialRadioTile('신체 장애'),
+              specialRadioTile('뭔가... 뭔가다'),
               ElevatedButton(
                 onPressed: () {
-                  // Action on press
+                  // print("${nameController.text}");
                 },
-                child: Text('회원가입'),
+                child: Text('회원가입하기'),
               ),
             ],
           ),
