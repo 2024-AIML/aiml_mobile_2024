@@ -10,16 +10,34 @@ class NaverMapWidget extends StatefulWidget {
 }
 
 class _NaverMapWidgetState extends State<NaverMapWidget> {
+  final String apiKey = 'xLnMgzkSEC6lL8V6M78bOzeTKuGSDwbrhMdUbgcj';
+  Image? mapImage;
+  String? selectedLocation;
+  Position? _currentPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    // _fetchMapData();
+    _getCurrentLocation();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        _currentPosition = position;
+      });
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return NaverMap(
       options: const NaverMapViewOptions(
-        initialCameraPosition: NCameraPosition(
-            target: NLatLng(getPosition.latitude, getPosition.longitude),
-            zoom: 10,
-        ),
-        mapType: NMapType.basic,
-        activeLayerGroups: [NLayerGroup.building, NLayerGroup.transit],
         // indoorEnable: true,
         // locationButtonEnable: false,
         // consumeSymbolTapEvents: false,
@@ -28,9 +46,6 @@ class _NaverMapWidgetState extends State<NaverMapWidget> {
         // mapControllerCompleter.complete(controller);
         // log("onMapReady", name: "onMapReady");
         print("로딩!");
-      },
-      onMapTapped: (point, latLng) {
-        debugPrint("${latLng.latitude}, ${latLng.latitude}");
       },
     );
   }
