@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart'as http;
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:geolocator/geolocator.dart';
 
 
 class MapScreen extends StatefulWidget {
@@ -19,7 +20,14 @@ class _MapScreenState extends State<MapScreen> {
   String? selectedLocation; //  선택된 약국 또는 병원을 저장하기 위한 변수
   final List<String> select = ['병원', '약국'];
   final List<String> items = ['거리순', '정확도순'];
+  Position? _currentPosition;
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchMapData();
+    _getCurrentLocation();
+  }
 
   Future<void> _fetchMapData() async
   {
@@ -54,12 +62,19 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchMapData();
+  Future<void> _getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        _currentPosition = position;
+      });
+    } catch (e) {
+      print("Error: $e");
+    }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +89,14 @@ class _MapScreenState extends State<MapScreen> {
             mapImage!,
           if (mapImage == null)
             CircularProgressIndicator(),
+
+          if (_currentPosition != null) // Show GPS location if available
+            Text(
+              'Current Location: ${_currentPosition!.latitude}, ${_currentPosition!.longitude}',
+            ),
+          if (_currentPosition == null) // Show loading indicator if location not available
+            CircularProgressIndicator(),
+
           Row(
             children: [
               Expanded(
