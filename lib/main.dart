@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => HomeScreen(),
         // 이건 임시로 해놓은 화면
-        // '/infra_info': (context) => JoinMember(),
+        '/infra_info': (context) => JoinMember(),
         // '/navigator': (context) => Login(),
         // '/search_missing_person': (context) => MyPage(),
         '/message': (context) => ShowCustomSearchMessage(),

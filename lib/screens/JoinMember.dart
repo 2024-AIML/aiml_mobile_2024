@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -20,6 +21,28 @@ class _JoinMemberState extends State<JoinMember> {
   TextEditingController emailController = TextEditingController();
   TextEditingController pwController = TextEditingController();
   TextEditingController checkController = TextEditingController();
+
+  Future<void> registerUserToFirestore(String name, String email) async{
+    try {
+      CollectionReference _user = FirebaseFirestore.instance.collection('user');
+
+      String lastFourDigits = phoneController.text.substring(phoneController.text.length - 4);
+      String documentId = '${lastFourDigits}_${name}';
+
+      // 사용자 정보 추가
+      await _user.doc(documentId).set({
+        'name': name,
+        'email': email,
+      });
+      print('사용자 정보가 성공적으로 등록되었습니다!');
+
+      // 사용자 정보 추가 후 필드 초기화
+    } catch (e) {
+      // 에러 처리
+      print('사용자 정보 등록 중 오류가 발생했습니다.');
+      print(e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +70,7 @@ class _JoinMemberState extends State<JoinMember> {
               ),
               SizedBox(height: 10.0),
 
-              fieldTitle('이메일'),
+              fieldTitle('핸드폰 번호'),
               SizedBox(
                 width: 25.0,
                 child: TextField(
@@ -64,7 +87,7 @@ class _JoinMemberState extends State<JoinMember> {
               Row(
                 children: [
                   SizedBox(
-                    width: 25.0,
+                    width: 200.0,
                     child: TextField(
                       controller: id1Controller,
                       decoration: InputDecoration(
@@ -75,7 +98,7 @@ class _JoinMemberState extends State<JoinMember> {
                   ),
                   Text(" - "),
                   SizedBox(
-                    width: 25.0,
+                    width: 150.0,
                     child: TextField(
                       controller: id2Controller,
                       decoration: InputDecoration(
@@ -141,7 +164,9 @@ class _JoinMemberState extends State<JoinMember> {
               specialRadioTile('뭔가... 뭔가다'),
               ElevatedButton(
                 onPressed: () {
-                  // print("${nameController.text}");
+                  String name = nameController.text;
+                  String email = emailController.text;
+                  registerUserToFirestore(name, email);
                 },
                 child: Text('회원가입하기'),
               ),
