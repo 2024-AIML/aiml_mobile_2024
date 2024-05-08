@@ -51,7 +51,6 @@ class _MapScreenState extends State<MapScreen> {
         });
 
 
-        //약국 위치 표시하는 코드를 여기에 추가
       }
       else {
         throw Exception('Failed to fetch map data');
