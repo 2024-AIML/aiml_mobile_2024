@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart'as http;
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 
+
 class MapScreen extends StatefulWidget {
   @override
   _MapScreenState createState() => _MapScreenState();
@@ -124,9 +125,10 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ],
           ),
-         
+
         ],
       ),
     );
   }
 }
+
