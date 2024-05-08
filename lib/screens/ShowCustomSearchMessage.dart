@@ -4,7 +4,6 @@ import '../service/HttpServiceForAPI.dart'; // API 호출을 위한 HttpService 
 
 class ShowCustomSearchMessage extends StatefulWidget {
   const ShowCustomSearchMessage({Key? key}) : super(key: key);
-
   @override
   _ShowCustomSearchMessageState createState() => _ShowCustomSearchMessageState();
 }
