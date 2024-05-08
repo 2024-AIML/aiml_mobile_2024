@@ -11,6 +11,24 @@ void main() async {
   });
   runApp(const infra_info());
 }
+//
+// class Infra_info_NaverMapWidget extends StatefulWidget {
+//   @override
+//   _Infra_info_NaverMapWidget createState() => _Infra_info_NaverMapWidget();
+// }
+//
+// class _Infra_info_NaverMapWidget extends State<Infra_info_NaverMapWidget> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return SingleChildScrollView(
+//       child: Column(
+//         children: [
+//           NaverMapWidget(), // 기존 NaverMapWidget의 build 호출
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class infra_info extends StatelessWidget {
   const infra_info({super.key});
@@ -27,6 +45,7 @@ class infra_info extends StatelessWidget {
           child: Container(
             width: 385,
             height: 465,
+            // child: Infra_info_NaverMapWidget(),
             child: NaverMapWidget(),
           ),
         ),
