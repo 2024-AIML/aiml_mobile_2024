@@ -2,7 +2,6 @@ import 'package:aiml_mobile_2024/firebase_options.dart';
 import 'package:aiml_mobile_2024/screens/JoinMember.dart';
 import 'package:aiml_mobile_2024/screens/MyPage.dart';
 import 'package:aiml_mobile_2024/screens/Sample_showData.dart';
-import 'package:aiml_mobile_2024/screens/infra_info.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import '../screens/HomeScreen.dart';
