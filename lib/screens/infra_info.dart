@@ -1,5 +1,7 @@
+import 'package:aiml_mobile_2024/widget/BottomNavigationBarWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:aiml_mobile_2024/widget/NaverMapWidget.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,49 +23,14 @@ class infra_info extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Color(0xffD9D9D9),
         ),
-        body: NaverMap(
-           options: const NaverMapViewOptions(
-            // indoorEnable: true,
-            // locationButtonEnable: false,
-            // consumeSymbolTapEvents: false,
-           ),
-          onMapReady: (controller) async {
-            // mapControllerCompleter.complete(controller);
-            // log("onMapReady", name: "onMapReady");
-            print("로딩!");
-          },
+        body: Center(
+          child: Container(
+            width: 385,
+            height: 465,
+            child: NaverMapWidget(),
+          ),
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Color(0xffD9D9D9),
-          onTap: (int index){
-            switch (index) {
-              case 0:
-                Navigator.pushNamed(context, '/');
-                break;
-              case 1:
-                Navigator.pushNamed(context, '/infra_info');
-                break;
-              case 2:
-                Navigator.pushNamed(context, '/navigator');
-                break;
-              case 3:
-                Navigator.pushNamed(context, '/search_missing_person');
-                break;
-              case 4:
-                Navigator.pushNamed(context, '/message');
-                break;
-              default:
-            }
-          },
-          items: [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.place), label: 'infra'),
-            BottomNavigationBarItem(icon: Icon(Icons.near_me), label: 'navi'),
-            BottomNavigationBarItem(icon: Icon(Icons.youtube_searched_for), label: 'sear'),
-            BottomNavigationBarItem(icon: Icon(Icons.mode_comment), label: 'mess')
-          ],
-        ),
+        bottomNavigationBar: BottomNavigationBarWidget(),
       )
 
       );
