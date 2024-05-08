@@ -1,5 +1,5 @@
 // import 'package:aiml_mobile_2024/screens/JoinMember.dart';
-// import 'package:aiml_mobile_2024/screens/infra_info.dart';
+import 'package:aiml_mobile_2024/screens/infra_info.dart';
 import 'package:flutter/material.dart';
 import '../screens/HomeScreen.dart';
 import '../screens/ShowCustomSearchMessage.dart'; // ShowCustomSearchMessages.dart 파일 import
@@ -14,7 +14,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-
       initialRoute: '/',
       routes: {
         '/': (context) => HomeScreen(),
