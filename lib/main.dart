@@ -15,6 +15,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(MyApp());
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super (key : key);
 
@@ -23,7 +25,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       routes: {
-        '/': (context) => HomeScreen(),
+        '/': (context) => JoinMember(),
         // 이건 임시로 해놓은 화면
         '/infra_info': (context) => MapScreen(),
         // '/navigator': (context) => Navigator(),
