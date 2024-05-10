@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => JoinMember(),
-        // 이건 임시로 해놓은 화면
+        // 이건 임시로 회원가입으로 해놓은 화면
         '/infra_info': (context) => MapScreen(),
         // '/navigator': (context) => Navigator(),
         // '/search_missing_person': (context) => SearchMissingPerson(),
