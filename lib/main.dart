@@ -2,9 +2,10 @@ import 'package:aiml_mobile_2024/firebase_options.dart';
 import 'package:aiml_mobile_2024/screens/JoinMember.dart';
 import 'package:aiml_mobile_2024/screens/MyPage.dart';
 import 'package:aiml_mobile_2024/screens/Sample_showData.dart';
-import 'package:aiml_mobile_2024/screens/infra_info.dart';
+import 'package:aiml_mobile_2024/screens/Navigation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 import '../screens/ShowMap.dart';
 import '../screens/HomeScreen.dart';
 import '../screens/ShowCustomSearchMessage.dart';
@@ -14,6 +15,10 @@ import 'screens/Sample_showData.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await NaverMapSdk.instance.initialize(clientId: '1dtmwihlto',
+      onAuthFailed: (ex) {
+        print("******네이버맵 인증 오류: $ex ******");
+      });
   runApp(MyApp());
 }
 
@@ -28,7 +33,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => JoinMember(),
         // 임시로 회원가입으로 해놓은 화면
         '/infra_info': (context) => MapScreen(),
-        // '/navigator': (context) => Navigator(),
+        '/navigator': (context) => Navigation(),
         // '/search_missing_person': (context) => SearchMissingPerson(),
         '/message': (context) => ShowCustomSearchMessage(),
       },
