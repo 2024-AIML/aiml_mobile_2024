@@ -10,17 +10,18 @@ import 'package:geolocator/geolocator.dart';
 class MapScreen extends StatefulWidget {
   @override
   _MapScreenState createState() => _MapScreenState();
-
 }
 
 
 class _MapScreenState extends State<MapScreen> {
-  final String apiKey = 'SwigVFb4E6Bw3FBWS0VW6Ht4AKh6iD5RLCNI5HdI';
+  final String apiKey = 'BfVUIMtidWxbl2oknXpImwn8hbjcphnWHSr6LPty';
   Image? mapImage;
   String? selectedLocation; //  선택된 약국 또는 병원을 저장하기 위한 변수
   final List<String> select = ['병원', '약국'];
   final List<String> items = ['거리순', '정확도순'];
   Position? _currentPosition;
+  NaverMapController? _controller;
+
 
   @override
   void initState() {
@@ -31,12 +32,12 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> _fetchMapData() async
   {
-    final String cliendID = 'e0em8isfp0';
-    final String clientSecret = 'SwigVFb4E6Bw3FBWS0VW6Ht4AKh6iD5RLCNI5HdI';
+    final String clientId = 'vbuyb9r3k9';
+    final String clientSecret = 'BfVUIMtidWxbl2oknXpImwn8hbjcphnWHSr6LPty';
     final String apiUrl = 'https://naveropenapi.apigw.ntruss.com/map-static/v2/raster?w=1170&h=1170&center=127.1054221,37.3591614&level=16';
 
     final headers = {
-      'X-NCP-APIGW-API-KEY-ID': cliendID,
+      'X-NCP-APIGW-API-KEY-ID': clientId,
       'X-NCP-APIGW-API-KEY': clientSecret,
     }; //HTTP 요청 헤더를 추가합니다.
 
@@ -49,8 +50,6 @@ class _MapScreenState extends State<MapScreen> {
         setState(() {
           mapImage = image;
         });
-
-
       }
       else {
         throw Exception('Failed to fetch map data');
@@ -68,11 +67,19 @@ class _MapScreenState extends State<MapScreen> {
       setState(() {
         _currentPosition = position;
       });
+
+      if(_controller != null)
+        {
+          _controller!.updateCamera(
+            NCameraUpdate.scrollAndZoomTo(
+              target: NLatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+            ),
+          );
+        }
     } catch (e) {
       print("Error: $e");
     }
   }
-
 
 
   @override
@@ -84,17 +91,26 @@ class _MapScreenState extends State<MapScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (mapImage != null)
-            mapImage!,
-          if (mapImage == null)
-            CircularProgressIndicator(),
-
-          if (_currentPosition != null) // Show GPS location if available
-            Text(
-              'Current Location: ${_currentPosition!.latitude}, ${_currentPosition!.longitude}',
+          if (_currentPosition != null)
+            Expanded(
+              child: NaverMap(
+                options: NaverMapViewOptions(
+                initialCameraPosition: NCameraPosition(
+                  target : NLatLng(
+                    _currentPosition!.latitude,
+                    _currentPosition!.longitude,
+                  ),
+                  zoom: 15,
+                )
+                ),
+              )
             ),
-          if (_currentPosition == null) // Show loading indicator if location not available
-            CircularProgressIndicator(),
+          if(_currentPosition == null)
+            Expanded(
+              child: Center(
+                child: CircularProgressIndicator(),
+              )
+            ),
 
           Row(
             children: [
@@ -151,6 +167,19 @@ class _MapScreenState extends State<MapScreen> {
         ],
       ),
     );
+  }
+
+  void onMapCreated(NaverMapController controller) {
+    _controller = controller;
+
+    if (_currentPosition != null) {
+      _controller!.updateCamera(
+        NCameraUpdate.scrollAndZoomTo(
+          target:NLatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+          zoom: 15,
+        ),
+      );
+    }
   }
 }
 
