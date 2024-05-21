@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../screens/FriendsInfo.dart';
+import '../screens/AddFriend.dart';
+import '../screens/FriendsNotification.dart';
 
 class FriendsList extends StatelessWidget {
   @override
@@ -9,8 +11,33 @@ class FriendsList extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('User Friends'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: () {
+              // '알림 받기' 아이콘을 눌렀을 때 수행할 작업을 여기에 추가하세요.
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NotificationsPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: UserFriendsList(),
+      floatingActionButton: Positioned(
+        top: 0,
+        right: 0,
+        child: IconButton(
+          icon: const Icon(Icons.person_add),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddFriend()),
+            );
+          },
+        ),
+      ),
     );
   }
 }
@@ -82,3 +109,5 @@ class UserFriendsList extends StatelessWidget {
     );
   }
 }
+
+
