@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../screens/FriendsInfo.dart';
 
 class FriendsList extends StatelessWidget {
   @override
@@ -39,7 +40,40 @@ class UserFriendsList extends StatelessWidget {
             return Card(
               child: ListTile(
                 title: Text(doc.id), // 문서의 ID 필드 값 출력
-                // 여기에 다른 필드들을 출력하거나 필요한 기능을 추가할 수 있습니다.
+                onTap: () async {
+                  try {
+                    DocumentSnapshot friendDoc = await FirebaseFirestore.instance
+                        .collection('user')  // 컬렉션 경로 확인
+                        .doc('user01')
+                        .collection('friends')
+                        .doc(doc.id) // 문서 ID 확인
+                        .get();
+
+                    print('Friend Doc Data: ${friendDoc.data()}'); // 데이터 확인
+
+                    GeoPoint friendLocation = friendDoc['loca'];
+                    if (friendLocation == null) {
+                      friendLocation = GeoPoint(0, 0); // 기본 위치 설정
+                    }
+
+                    print('Friend Location: $friendLocation'); // 위치 확인
+
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FriendsInfo(
+                          friendsName: doc.id,
+                          friendsLocation: friendLocation,
+                        ),
+                      ),
+                    );
+                  } catch (e) {
+                    print('Error retrieving friend location: $e');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error retrieving friend location')),
+                    );
+                  }
+                },
               ),
             );
           }).toList(),
