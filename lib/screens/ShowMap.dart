@@ -5,22 +5,25 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart'as http;
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:geolocator/geolocator.dart';
-
+import 'dart:convert';
+import '../service/InfraInfoService.dart';
 
 class MapScreen extends StatefulWidget {
   @override
   _MapScreenState createState() => _MapScreenState();
 }
 
-
 class _MapScreenState extends State<MapScreen> {
-  final String apiKey = 'BfVUIMtidWxbl2oknXpImwn8hbjcphnWHSr6LPty';
+  final String naverApiKey = 'BfVUIMtidWxbl2oknXpImwn8hbjcphnWHSr6LPty';
   Image? mapImage;
-  String? selectedLocation; //  선택된 약국 또는 병원을 저장하기 위한 변수
+  String? selectedLocation;
   final List<String> select = ['병원', '약국'];
-  final List<String> items = ['거리순', '정확도순'];
+  List<dynamic> _hospitals = [];
+  List<dynamic> _pharmacies = [];
+  List<NMarker> markers = [];
   Position? _currentPosition;
   NaverMapController? _controller;
+  final InfraInfoService _infraInfoService = InfraInfoService();
 
 
   @override
@@ -67,20 +70,57 @@ class _MapScreenState extends State<MapScreen> {
       setState(() {
         _currentPosition = position;
       });
+      _fetchHospitals();
 
-      if(_controller != null)
-        {
-          _controller!.updateCamera(
-            NCameraUpdate.scrollAndZoomTo(
-              target: NLatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-            ),
-          );
-        }
+      if (_controller != null) {
+        _controller!.updateCamera(
+          NCameraUpdate.scrollAndZoomTo(
+            target: NLatLng(
+                _currentPosition!.latitude, _currentPosition!.longitude),
+          ),
+        );
+      }
     } catch (e) {
       print("Error: $e");
     }
   }
 
+
+  Future<void> _fetchHospitals() async {
+    if (_currentPosition == null) return;
+
+    try {
+      final hospitals = await _infraInfoService.fetchHospitals(
+        _currentPosition!.latitude,
+        _currentPosition!.longitude,
+      );
+
+      setState(() {
+        _hospitals = hospitals;
+      });
+
+      _updateMarkers();
+    } catch (e) {
+      print("Error fetching hospitals: $e");
+    }
+  }
+
+  void _updateMarkers() {
+    setState(() {
+      markers = _hospitals.map((hospital) {
+        return NMarker(
+          id: hospital.name,
+          position: NLatLng(hospital.lat, hospital.lng),
+        );
+      }).toList();
+      if (_controller != null) {
+        _controller!.clearOverlays();
+        for (var marker in markers) {
+          _controller!.addOverlay(marker);
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,93 +133,85 @@ class _MapScreenState extends State<MapScreen> {
         children: [
           if (_currentPosition != null)
             Expanded(
-              child: NaverMap(
-                options: NaverMapViewOptions(
-                initialCameraPosition: NCameraPosition(
-                  target : NLatLng(
-                    _currentPosition!.latitude,
-                    _currentPosition!.longitude,
+                child: NaverMap(
+                  options: NaverMapViewOptions(
+                      initialCameraPosition: NCameraPosition(
+                        target: NLatLng(
+                          _currentPosition!.latitude,
+                          _currentPosition!.longitude,
+                        ),
+                        zoom: 15,
+                      ),
                   ),
-                  zoom: 15,
+                  onMapReady: (controller){
+                    _controller = controller;
+                    _updateMarkers();
+                  },
                 )
-                ),
-              )
             ),
-          if(_currentPosition == null)
+          if (_currentPosition != null)
             Expanded(
-              child: Center(
-                child: CircularProgressIndicator(),
-              )
-            ),
-
-          Row(
-            children: [
-              Expanded(
-                child: ListTile(
-                  title: Text('약국'),
-                  leading: Radio<String>(
-                    value: '약국',
-                    groupValue: selectedLocation,
-                    onChanged: (String? value) {
-                      setState(() {
-                        selectedLocation = value;
-                      });
-                    },
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ListTile(
+                          title: Text('약국'),
+                          leading: Radio<String>(
+                            value: '약국',
+                            groupValue: selectedLocation,
+                            onChanged: (String? value) {
+                              setState(() {
+                                selectedLocation = value;
+                                _updateMarkers();
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: ListTile(
+                          title: Text('병원'),
+                          leading: Radio<String>(
+                            value: '병원',
+                            groupValue: selectedLocation,
+                            onChanged: (String? value) {
+                              setState(() {
+                                selectedLocation = value;
+                                _updateMarkers();
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-              Expanded(
-                child: ListTile(
-                  title: Text('병원'),
-                  leading: Radio<String>(
-                    value: '병원',
-                    groupValue: selectedLocation,
-                    onChanged: (String? value) {
-                      setState(() {
-                        selectedLocation = value;
-                      });
-                    },
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    DropdownButton<String>(
-                      value: items.first,
-                      onChanged: (String? newValue) {
-                        // Do something when the value changes
-                      },
-                      items: items.map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: _hospitals.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(_hospitals[index].name),
                         );
-                      }).toList(),
+                      },
                     ),
-                  ],
-                ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: _pharmacies.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(_pharmacies[index]),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-
+            ),
         ],
       ),
     );
   }
-
-  void onMapCreated(NaverMapController controller) {
-    _controller = controller;
-
-    if (_currentPosition != null) {
-      _controller!.updateCamera(
-        NCameraUpdate.scrollAndZoomTo(
-          target:NLatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-          zoom: 15,
-        ),
-      );
-    }
-  }
 }
-
