@@ -1,4 +1,5 @@
 import 'package:aiml_mobile_2024/firebase_options.dart';
+import 'package:aiml_mobile_2024/screens/FriendsList.dart';
 import 'package:aiml_mobile_2024/screens/JoinMember.dart';
 import 'package:aiml_mobile_2024/screens/MyPage.dart';
 import 'package:aiml_mobile_2024/screens/Navigation.dart';
@@ -31,12 +32,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       routes: {
-        '/': (context) => JoinMember(),
+        '/': (context) => HomeScreen(),
         // 임시로 회원가입으로 해놓은 화면
         '/infra_info': (context) => MapScreen(),
-        '/navigator': (context) => Navigation(),
-        // '/search_missing_person': (context) => SearchMissingPerson(),
+        '/navigator': (context) => Navigator(),
+        '/search_missing_person': (context) => FriendsList(),
         '/message': (context) => ShowCustomSearchMessage(),
+        '/MyPage' : (context) => MyPage(),
       },
     );
   }

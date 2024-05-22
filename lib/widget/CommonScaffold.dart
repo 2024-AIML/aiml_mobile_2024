@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 class CommonScaffold extends StatelessWidget {
   final Widget body;
   final Widget title;
+  final List<Widget>? actions;
 
   const CommonScaffold({
     Key? key,
     required this.title,
-    required this.body
+    required this.body,
+    this.actions,
   }) : super(key: key); // key를 명시하지 않습니다.
 
   @override
@@ -17,6 +19,7 @@ class CommonScaffold extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: title,
+        actions: actions,
       ),
       body: body,
       bottomNavigationBar: BottomNavigationBar(
