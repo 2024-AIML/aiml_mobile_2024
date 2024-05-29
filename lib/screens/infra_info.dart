@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:aiml_mobile_2024/widget/NaverMapWidget.dart';
 
-void main() async {
+/* void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NaverMapSdk.instance.initialize(clientId: '1dtmwihlto',
   onAuthFailed: (ex) {
@@ -55,4 +55,4 @@ class infra_info extends StatelessWidget {
       );
   }
 
-}
+}*/

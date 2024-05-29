@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 // 이거 아직 오류 뜸
 
-class ShowData extends StatefulWidget {
+/*class ShowData extends StatefulWidget {
   @override
   _ShowDataState createState() => _ShowDataState();
 }
@@ -51,3 +51,4 @@ class _ShowDataState extends State<ShowData> {
     );
   }
 }
+*/

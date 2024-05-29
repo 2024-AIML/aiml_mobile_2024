@@ -18,12 +18,12 @@ class _MapScreenState extends State<MapScreen> {
   Image? mapImage;
   String? selectedLocation;
   final List<String> select = ['병원', '약국'];
-  List<dynamic> _hospitals = [];
-  List<dynamic> _pharmacies = [];
+  List _hospitals = [];
+  List _pharmacies = [];
   List<NMarker> markers = [];
   Position? _currentPosition;
   NaverMapController? _controller;
-  final InfraInfoService _infraInfoService = InfraInfoService();
+  bool isLoading = true;
 
 
   @override
@@ -31,6 +31,9 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     _fetchMapData();
     _getCurrentLocation();
+    _fetchHospitals();
+    _fetchPharmacies();
+    _updateMarkers();
   }
 
   Future<void> _fetchMapData() async
@@ -71,6 +74,7 @@ class _MapScreenState extends State<MapScreen> {
         _currentPosition = position;
       });
       _fetchHospitals();
+      _fetchPharmacies();
 
       if (_controller != null) {
         _controller!.updateCamera(
@@ -87,37 +91,84 @@ class _MapScreenState extends State<MapScreen> {
 
 
   Future<void> _fetchHospitals() async {
-    if (_currentPosition == null) return;
+    if (_currentPosition != null) {
+      try {
+        final data = await InfraInfoService.fetchHospitals(
+            _currentPosition!.latitude, _currentPosition!.longitude);
+        print(data);
+        setState(() {
+          _hospitals = data;
+          isLoading = false;
+        });
+        _updateMarkers();
+      } catch (e) {
+        print('Error fetching hospitals: $e');
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
 
-    try {
-      final hospitals = await _infraInfoService.fetchHospitals(
-        _currentPosition!.latitude,
-        _currentPosition!.longitude,
-      );
-
-      setState(() {
-        _hospitals = hospitals;
-      });
-
-      _updateMarkers();
-    } catch (e) {
-      print("Error fetching hospitals: $e");
+  Future<void> _fetchPharmacies() async {
+    if (_currentPosition != null) {
+      try {
+        final data = await InfraInfoService.fetchPharmacies(
+            _currentPosition!.latitude, _currentPosition!.longitude);
+        print(data);
+        setState(() {
+          _pharmacies = data;
+          isLoading = false;
+        });
+        _updateMarkers();
+      } catch (e) {
+        print('Error fetching hospitals: $e');
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
   void _updateMarkers() {
     setState(() {
-      markers = _hospitals.map((hospital) {
-        return NMarker(
-          id: hospital.name,
-          position: NLatLng(hospital.lat, hospital.lng),
-        );
-      }).toList();
+      markers = [];
+      if (selectedLocation == '병원') {
+        markers = _hospitals.map((hospital) {
+          print('Adding marker for hospital: ${hospital.name}, Lat: ${hospital
+              .latitude}, Lon: ${hospital.longitude}');
+          return NMarker(
+            id: hospital.name,
+            position: NLatLng(hospital.latitude, hospital.longitude),
+          );
+        }).toList();
+
+
+      } else if (selectedLocation == '약국') {
+        markers = _pharmacies.map((pharmacy) {
+          return NMarker(
+            id: pharmacy.name,
+            position: NLatLng(pharmacy.latitude, pharmacy.longitude),
+          );
+        }).toList();
+      }
+      print('Markers list: $markers');
+
       if (_controller != null) {
-        _controller!.clearOverlays();
-        for (var marker in markers) {
-          _controller!.addOverlay(marker);
-        }
+        _controller!.clearOverlays().then((_) {
+          for (var marker in markers) {
+            _controller!.addOverlay(marker).then((_) {
+              print('Marker added to map.');
+              setState(() {
+
+              });
+            }).catchError((e) {
+              print('Error adding marker: $e');
+            });
+          }
+        }).catchError((e) {
+          print('Error clearing overlays: $e');
+        });
       }
     });
   }
@@ -133,21 +184,22 @@ class _MapScreenState extends State<MapScreen> {
         children: [
           if (_currentPosition != null)
             Expanded(
-                child: NaverMap(
-                  options: NaverMapViewOptions(
-                      initialCameraPosition: NCameraPosition(
-                        target: NLatLng(
-                          _currentPosition!.latitude,
-                          _currentPosition!.longitude,
-                        ),
-                        zoom: 15,
-                      ),
+              child: NaverMap(
+                options: NaverMapViewOptions(
+                  initialCameraPosition: NCameraPosition(
+                    target: NLatLng(
+                      _currentPosition!.latitude,
+                      _currentPosition!.longitude,
+                    ),
+                    zoom: 14,
                   ),
-                  onMapReady: (controller){
+                ),
+                onMapReady: (controller) {
+                  setState(() {
                     _controller = controller;
-                    _updateMarkers();
-                  },
-                )
+                  });
+                },
+              ),
             ),
           if (_currentPosition != null)
             Expanded(
@@ -164,7 +216,7 @@ class _MapScreenState extends State<MapScreen> {
                             onChanged: (String? value) {
                               setState(() {
                                 selectedLocation = value;
-                                _updateMarkers();
+                                _updateMarkers(); // Update markers when '약국' radio button is selected
                               });
                             },
                           ),
@@ -179,7 +231,7 @@ class _MapScreenState extends State<MapScreen> {
                             onChanged: (String? value) {
                               setState(() {
                                 selectedLocation = value;
-                                _updateMarkers();
+                                _updateMarkers(); // Update markers when '병원' radio button is selected
                               });
                             },
                           ),
@@ -187,26 +239,34 @@ class _MapScreenState extends State<MapScreen> {
                       ),
                     ],
                   ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: _hospitals.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(_hospitals[index].name),
-                        );
-                      },
+                  if (selectedLocation == '병원')
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: _hospitals.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(_hospitals[index].name),
+                            subtitle: Text(
+                                '${_hospitals[index].distance?.toStringAsFixed(
+                                    2)} km'),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: _pharmacies.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(_pharmacies[index]),
-                        );
-                      },
+                  if (selectedLocation == '약국')
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: _pharmacies.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(_pharmacies[index].name),
+                            subtitle: Text(
+                              '${_pharmacies[index].distance?.toStringAsFixed(2)}km'
+                            )
+                          );
+                        },
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),

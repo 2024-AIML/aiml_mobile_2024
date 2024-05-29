@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-void main() {
+/*void main() {
   runApp(const infra_info());
 }
 
-class infra_info extends StatelessWidget {
+/* class infra_info extends StatelessWidget {
   const infra_info({super.key});
 
   @override
@@ -487,4 +487,4 @@ class InfraInfo extends StatelessWidget {
       ],
     );
   }
-}
+} */ */

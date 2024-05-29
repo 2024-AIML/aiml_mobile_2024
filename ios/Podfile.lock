@@ -952,7 +952,7 @@ PODS:
   - BoringSSL-GRPC/Implementation (0.0.32):
     - BoringSSL-GRPC/Interface (= 0.0.32)
   - BoringSSL-GRPC/Interface (0.0.32)
-  - cloud_firestore (4.17.3):
+  - cloud_firestore (4.17.5):
     - Firebase/Firestore (= 10.25.0)
     - firebase_core
     - Flutter
@@ -970,18 +970,18 @@ PODS:
   - Firebase/Installations (10.25.0):
     - Firebase/CoreOnly
     - FirebaseInstallations (~> 10.25.0)
-  - firebase_app_installations (0.2.5-5):
+  - firebase_app_installations (0.2.5-7):
     - Firebase/Installations (= 10.25.0)
     - firebase_core
     - Flutter
-  - firebase_auth (4.19.5):
+  - firebase_auth (4.20.0):
     - Firebase/Auth (= 10.25.0)
     - firebase_core
     - Flutter
-  - firebase_core (2.31.0):
+  - firebase_core (2.32.0):
     - Firebase/CoreOnly (= 10.25.0)
     - Flutter
-  - firebase_database (10.5.5):
+  - firebase_database (10.5.7):
     - Firebase/Database (= 10.25.0)
     - firebase_core
     - Flutter
@@ -1143,7 +1143,7 @@ PODS:
   - gRPC-Core/Interface (1.62.5)
   - gRPC-Core/Privacy (1.62.5)
   - GTMSessionFetcher/Core (3.4.1)
-  - kakao_flutter_sdk_common (1.9.1-2):
+  - kakao_flutter_sdk_common (1.9.2):
     - Flutter
   - leveldb-library (1.22.5)
   - location (0.0.1):
@@ -1239,12 +1239,12 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   abseil: d121da9ef7e2ff4cab7666e76c5a3e0915ae08c3
   BoringSSL-GRPC: 1e2348957acdbcad360b80a264a90799984b2ba6
-  cloud_firestore: 792f773e5e8c080ffcbadd49f9fb397927f29af6
+  cloud_firestore: 003d53b6b8b392600b7769acf9421cc4f23e5911
   Firebase: 0312a2352584f782ea56f66d91606891d4607f06
-  firebase_app_installations: c3380b8dcb3fa9cd5cc8a466163980b6f9649e44
-  firebase_auth: 76ea642e91a9e914b3af751a416046ce1a965cf4
-  firebase_core: 0b39f4f424e02eecabb2356ddf331fa07b772af8
-  firebase_database: f28e95d6c770bf0bb7da58b307cc38855b1db834
+  firebase_app_installations: 89cd1c3c10104f4f875eb0b9f29d49fb991d8f5f
+  firebase_auth: 5719ddc9f654b813405899480e84971bd8e61235
+  firebase_core: a626d00494efa398e7c54f25f1454a64c8abf197
+  firebase_database: 2713033e426b176d4fe5e7195f3d19aa1b549a91
   FirebaseAppCheckInterop: 5da5ce93e8797a215e3f677fb0654b74e736c8b8
   FirebaseAuth: c0f93dcc570c9da2bffb576969d793e95c344fbb
   FirebaseCore: 7ec4d0484817f12c3373955bc87762d96842d483
@@ -1262,7 +1262,7 @@ SPEC CHECKSUMS:
   "gRPC-C++": e725ef63c4475d7cdb7e2cf16eb0fde84bd9ee51
   gRPC-Core: eee4be35df218649fe66d721a05a7f27a28f069b
   GTMSessionFetcher: 8000756fc1c19d2e5697b90311f7832d2e33f6cd
-  kakao_flutter_sdk_common: ac22d95194585407db3fbc5f838d67ced11ea0f0
+  kakao_flutter_sdk_common: 049c9341e325da17ac75751a35646dbbcfa06891
   leveldb-library: e8eadf9008a61f9e1dde3978c086d2b6d9b9dc28
   location: 3a2eed4dd2fab25e7b7baf2a9efefe82b512d740
   nanopb: 438bc412db1928dac798aa6fd75726007be04262
