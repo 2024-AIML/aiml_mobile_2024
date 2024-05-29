@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import '../widget/CommonScaffold.dart';
+import 'HomeScreen.dart';
 
 
 class JoinMember extends StatefulWidget {
@@ -22,7 +23,7 @@ class _JoinMemberState extends State<JoinMember> {
   TextEditingController pwController = TextEditingController();
   TextEditingController checkController = TextEditingController();
 
-  Future<void> registerUserToFirestore(String name, String email) async{
+  Future<void> registerUserToFirestore(String name, String email, String phone, String id1, String id2, String pw) async{
     try {
       CollectionReference _user = FirebaseFirestore.instance.collection('user');
 
@@ -33,8 +34,13 @@ class _JoinMemberState extends State<JoinMember> {
       await _user.doc(documentId).set({
         'name': name,
         'email': email,
+        'phone' : phone,
+        'id1' : id1,
+        'id2' : id2,
+        'pw' : pw,
       });
       print('사용자 정보가 성공적으로 등록되었습니다!');
+      _showRegistrationSuccessDialog();
 
       // 사용자 정보 추가 후 필드 초기화
     } catch (e) {
@@ -42,6 +48,28 @@ class _JoinMemberState extends State<JoinMember> {
       print('사용자 정보 등록 중 오류가 발생했습니다.');
       print(e.toString());
     }
+  }
+
+  void _showRegistrationSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('회원가입이 완료되었습니다.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('확인'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => HomeScreen(),
+                ));
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -166,7 +194,13 @@ class _JoinMemberState extends State<JoinMember> {
                 onPressed: () {
                   String name = nameController.text;
                   String email = emailController.text;
-                  registerUserToFirestore(name, email);
+                  String phone = phoneController.text;
+                  String id1 = id1Controller.text;
+                  String id2 = id2Controller.text;
+                  String pw = pwController.text;
+
+                  //chk' : chk,
+                  registerUserToFirestore(name, email, phone, id1, id2, pw);
                 },
                 child: Text('회원가입하기'),
               ),
