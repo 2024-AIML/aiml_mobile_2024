@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:http/http.dart'as http;
+import 'package:http/http.dart' as http;
 
 class FriendsInfo extends StatefulWidget {
   final String friendsName;
@@ -13,7 +13,7 @@ class FriendsInfo extends StatefulWidget {
 }
 
 class _FriendsInfoState extends State<FriendsInfo> {
-  Image? mapImage; // 초기화되지 않은 상태로 설정
+  Image? mapImage;
 
   @override
   void initState() {
@@ -22,6 +22,8 @@ class _FriendsInfoState extends State<FriendsInfo> {
   }
 
   Future<void> _fetchMapData() async {
+    print('친구 위치: ${widget.friendsLocation.latitude}, ${widget.friendsLocation.longitude}');
+
     final String clientID = 'e0em8isfp0';
     final String clientSecret = 'SwigVFb4E6Bw3FBWS0VW6Ht4AKh6iD5RLCNI5HdI';
     final String apiUrl = 'https://naveropenapi.apigw.ntruss.com/map-static/v2/raster?w=1170&h=1170&center=${widget.friendsLocation.longitude},${widget.friendsLocation.latitude}&level=16';
@@ -34,6 +36,9 @@ class _FriendsInfoState extends State<FriendsInfo> {
     try {
       final response = await http.get(Uri.parse(apiUrl), headers: headers);
 
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
       if (response.statusCode == 200) {
         final imageBytes = response.bodyBytes;
         final image = Image.memory(imageBytes);
@@ -41,7 +46,7 @@ class _FriendsInfoState extends State<FriendsInfo> {
           mapImage = image;
         });
       } else {
-        throw Exception('지도 데이터를 가져오는데 실패했습니다.');
+        throw Exception('지도 데이터를 가져오는데 실패했습니다. 상태 코드: ${response.statusCode}');
       }
     } catch (e) {
       print('지도 데이터를 가져오는 중 오류 발생: $e');
