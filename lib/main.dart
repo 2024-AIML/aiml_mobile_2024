@@ -16,7 +16,7 @@ import 'screens/LogIn.dart'; // ShowCustomSearchMessages.dart 파일 import
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await NaverMapSdk.instance.initialize(clientId: '1dtmwihlto',
+  await NaverMapSdk.instance.initialize(clientId: 'vbuyb9r3k9',
       onAuthFailed: (ex) {
         print("******네이버맵 인증 오류: $ex ******");
       });
