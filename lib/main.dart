@@ -2,9 +2,13 @@ import 'package:aiml_mobile_2024/firebase_options.dart';
 import 'package:aiml_mobile_2024/screens/FriendsList.dart';
 import 'package:aiml_mobile_2024/screens/JoinMember.dart';
 import 'package:aiml_mobile_2024/screens/MyPage.dart';
+<<<<<<< HEAD
+import 'package:aiml_mobile_2024/screens/infra_info.dart';
+=======
 import 'package:aiml_mobile_2024/screens/Navigation.dart';
 import 'package:aiml_mobile_2024/screens/Sample_showData.dart';
 import 'package:aiml_mobile_2024/screens/Navigation_Naver.dart';
+>>>>>>> deb3a21d905bf5f2b041de00bf5e51dc802a3200
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
@@ -12,7 +16,6 @@ import '../screens/ShowMap.dart';
 import '../screens/HomeScreen.dart';
 import '../screens/ShowCustomSearchMessage.dart';
 import 'screens/LogIn.dart'; // ShowCustomSearchMessages.dart 파일 import
-import 'screens/Sample_showData.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

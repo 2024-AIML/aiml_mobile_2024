@@ -33,7 +33,7 @@ class _NavigationState extends State<Navigation> {
           child: ElevatedButton(
 //            onPressed: _launchURL,
           onPressed: () async{
-            await launch(url);
+            //await launch(url);
           },
             child: Text('Open URL Scheme'),
           ),
