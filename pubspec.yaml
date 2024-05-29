@@ -42,11 +42,8 @@ dependencies:
   cupertino_icons: ^1.0.6
   firebase_app_installations: ^0.2.5+4
   firebase_database: ^10.5.5
-<<<<<<< HEAD
   excel: ^2.0.3
-=======
   url_launcher: ^6.2.6
->>>>>>> deb3a21d905bf5f2b041de00bf5e51dc802a3200
 
 dev_dependencies:
   flutter_test:
