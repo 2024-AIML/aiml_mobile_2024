@@ -12,6 +12,7 @@ import '../screens/ShowMap.dart';
 import '../screens/HomeScreen.dart';
 import '../screens/ShowCustomSearchMessage.dart';
 import 'screens/LogIn.dart'; // ShowCustomSearchMessages.dart 파일 import
+import 'screens/Address.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => HomeScreen(),
         // 임시로 회원가입으로 해놓은 화면
-        '/infra_info': (context) => MapScreen(),
+        '/infra_info': (context) => AddressScreen(),
         '/navigator': (context) => Navigator(),
         '/search_missing_person': (context) => FriendsList(),
         '/message': (context) => ShowCustomSearchMessage(),

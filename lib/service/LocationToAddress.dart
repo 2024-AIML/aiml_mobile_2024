@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LocationToAddressService {
   final String naverClientId = 'vbuyb9r3k9';
   final String naverClientSecret = 'BfVUIMtidWxbl2oknXpImwn8hbjcphnWHSr6LPty';
-  final String serverUrl = 'http://127.0.0.1:8080/location/address';
+  final String serverUrl = 'http://127.0.0.1:8080/api/address';
 
   Future<Position> getCurrentLocation() async {
     bool serviceEnabled;
@@ -46,21 +47,19 @@ class LocationToAddressService {
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
 
-        if (jsonResponse['results'] != null && jsonResponse['results'].isNotEmpty) {
+        if (jsonResponse['results'] != null &&
+            jsonResponse['results'].isNotEmpty) {
           final result = jsonResponse['results'][0];
           final region = result['region'];
           final land = result['land'];
 
-          // Extract region components
           final area1 = region?['area1']?['name'] ?? '';
           final area2 = region?['area2']?['name'] ?? '';
           final area3 = region?['area3']?['name'] ?? '';
 
-          // Extract land components
           final landName = land?['name'] ?? '';
-          final number1 = land?['number1'] ?? ''; // This should be replaced with the correct path if available in the response
+          final number1 = land?['number1'] ?? ''; // Adjust if necessary
 
-          // Construct the full address
           final address = [
             area1,
             area2,
@@ -73,9 +72,7 @@ class LocationToAddressService {
         } else {
           throw Exception('No results found in the response');
         }
-      }
-
-      else {
+      } else {
         throw Exception('Failed to fetch address');
       }
     } catch (e) {
@@ -83,20 +80,25 @@ class LocationToAddressService {
     }
   }
 
-  Future<void> sendAddressToServer(String address) async {
+  Future<void> sendRequest(String address) async {
+    final url = Uri.parse(serverUrl);
+
     try {
       final response = await http.post(
-        Uri.parse(serverUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'address': address}),
+        url,
+        headers: {
+          'Content-Type': 'application/json', // 토큰 없이 요청할 경우, Authorization 헤더 제거
+        },
+        body: jsonEncode({"address": address}),
       );
 
-      if (response.statusCode != 200) {
-        throw Exception('Failed to send address.');
+      if (response.statusCode == 200) {
+        print('Request successful');
+      } else {
+        print('Failed to send address: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      throw Exception('Error sending address to server: $e');
+      print('Error sending request: $e');
     }
   }
 }
-

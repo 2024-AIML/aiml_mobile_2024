@@ -44,7 +44,7 @@ class _AddressScreenState extends State<AddressScreen> {
       setState(() {
         _currentAddress = address;
       });
-      await _service.sendAddressToServer(address);
+      await _service.sendRequest(address);
     } catch (e) {
       print(e);
     }
