@@ -8,12 +8,12 @@ import 'package:geolocator/geolocator.dart';
 import 'dart:convert';
 import '../service/InfraInfoService.dart';
 
-class MapScreen extends StatefulWidget {
+class InfraScreen extends StatefulWidget {
   @override
-  _MapScreenState createState() => _MapScreenState();
+  _InfraScreenState createState() => _InfraScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _InfraScreenState extends State<InfraScreen> {
   final String naverApiKey = 'BfVUIMtidWxbl2oknXpImwn8hbjcphnWHSr6LPty';
   Image? mapImage;
   String? selectedLocation;

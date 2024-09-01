@@ -35,7 +35,7 @@ class LocationToAddressService {
 
   Future<String> getAddressFromLatLng(double latitude, double longitude) async {
     final String apiUrl =
-        'https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=$longitude,$latitude&output=json';
+        'https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=$longitude,$latitude&sourcers=epsg:4326&orders=roadaddr&output=json';
     final headers = {
       'X-NCP-APIGW-API-KEY-ID': naverClientId,
       'X-NCP-APIGW-API-KEY': naverClientSecret,
@@ -53,18 +53,20 @@ class LocationToAddressService {
           final region = result['region'];
           final land = result['land'];
 
+          print('land: $land');
+
           final area1 = region?['area1']?['name'] ?? '';
           final area2 = region?['area2']?['name'] ?? '';
           final area3 = region?['area3']?['name'] ?? '';
 
-          final landName = land?['name'] ?? '';
+          final Name = land?['name'] ?? '';
           final number1 = land?['number1'] ?? ''; // Adjust if necessary
 
           final address = [
             area1,
             area2,
             area3,
-            landName,
+            Name,
             number1
           ].where((e) => e.isNotEmpty).join(' ');
 
