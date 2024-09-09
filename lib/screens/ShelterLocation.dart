@@ -12,13 +12,14 @@ import 'package:csv/csv.dart';
 import 'dart:typed_data';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:url_launcher/url_launcher.dart';
+import '../widget/CommonScaffold.dart';
 
-class ShelterScreen extends StatefulWidget {
+class ShelterLocationScreen extends StatefulWidget {
   @override
-  _ShelterScreenState createState() => _ShelterScreenState();
+  _ShelterLocationScreenState createState() => _ShelterLocationScreenState();
 }
 
-class _ShelterScreenState extends State<ShelterScreen> {
+class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
   final String naverApiKey = 'BfVUIMtidWxbl2oknXpImwn8hbjcphnWHSr6LPty';
   Image? mapImage;
   String? selectedLocation;
@@ -35,8 +36,7 @@ class _ShelterScreenState extends State<ShelterScreen> {
     _getCurrentLocation();
   }
 
-  Future<void> _fetchMapData() async
-  {
+  Future<void> _fetchMapData() async {
     final String clientId = 'vbuyb9r3k9';
     final String clientSecret = 'BfVUIMtidWxbl2oknXpImwn8hbjcphnWHSr6LPty';
     final String apiUrl = 'https://naveropenapi.apigw.ntruss.com/map-static/v2/raster?w=1170&h=1170&center=127.1054221,37.3591614&level=16';
@@ -128,9 +128,6 @@ class _ShelterScreenState extends State<ShelterScreen> {
     }
   }
 
-
-
-
   Future<List<Shelter>> loadSheltersFromCsv() async {
     final ByteData data = await rootBundle.load('assets/shelters/shelters.csv');
     final Uint8List bytes = data.buffer.asUint8List();
@@ -185,10 +182,8 @@ class _ShelterScreenState extends State<ShelterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('주변 대피소'),
-      ),
+    return CommonScaffold(
+      title: Text("주변 대피소"),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -218,7 +213,6 @@ class _ShelterScreenState extends State<ShelterScreen> {
               itemBuilder: (context, index) {
                 final shelter = _shelters[index];
 
-// Determine the text color based on Capacity
                 Color capacityColor;
                 if (shelter.Capacity == 0) {
                   capacityColor = Colors.red;
@@ -230,47 +224,45 @@ class _ShelterScreenState extends State<ShelterScreen> {
 
                 return InkWell(
                   onTap: () async {
-                    // Assuming you have an API endpoint to fetch shelter details
                     final url = 'nmap://route/walk?slat=37.4640070&slng=126.9522394&sname=%EC%84%9C%EC%9A%B8%EB%8C%80%ED%95%99%EA%B5%90&dlat=37.5209436&dlng=127.1230074&dname=%EC%98%AC%EB%A6%BC%ED%94%BD%EA%B3%B5%EC%9B%90&appname=com.example.aiml_mobile_2024/${shelter.InfraName}';
                     final Uri uri = Uri.parse(url);
 
                     await sendShelterClickedEvent(shelter.InfraName);
 
-                    if (await canLaunchUrl(uri)){
+                    if (await canLaunchUrl(uri)) {
                       await launch(url);
-                    }else{
+                    } else {
                       print('Could not launch $url');
                     }
                   },
-
-                child: ListTile(
-                  title: Row(
-                    children: [
-                      Expanded(
-                        flex:3,
-                        child: Text(
-                          shelter.InfraName,
+                  child: ListTile(
+                    title: Row(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            shelter.InfraName,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Spacer(),
+                        Text(
+                          '${shelter.distance.toStringAsFixed(2)} km',
                           overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      Spacer(), // Pushes the following widgets to the right
-                      Text(
-                        '${shelter.distance.toStringAsFixed(2)} km',
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(width: 20), // Adjust space between distance and capacity
-                      Text(
-                        ' ${shelter.Capacity.toInt()}',
-                        style: TextStyle(color:capacityColor),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                        SizedBox(width: 20),
+                        Text(
+                          ' ${shelter.Capacity.toInt()}',
+                          style: TextStyle(color: capacityColor),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
                 );
               },
             ),
-          )
+          ),
         ],
       ),
     );
