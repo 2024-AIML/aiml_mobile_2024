@@ -12,8 +12,8 @@ class FriendLocation extends StatefulWidget {
 }
 
 class _FriendLocationState extends State<FriendLocation> {
-  List<String> friends = [];
-  List<String> filteredFriends = [];
+  List<Map<String, dynamic>> friends = []; // Stores friend info with location
+  List<Map<String, dynamic>> filteredFriends = [];
   TextEditingController searchController = TextEditingController();
   bool isLoading = false;
   Position? _currentPosition;
@@ -28,40 +28,41 @@ class _FriendLocationState extends State<FriendLocation> {
 
   Future<void> _fetchFriends() async {
     setState(() {
-      isLoading = true; // 데이터 로딩 중
+      isLoading = true; // Loading data
     });
     try {
-      // API 주소를 입력하세요.
+      // Replace with the actual API URL
       final response = await http.get(Uri.parse('api 주소 여기 입력'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {
-          friends = data.cast<String>();
-          filteredFriends = friends; // 초기에는 전체 목록 표시
+          // Assuming the API returns a list of friends with 'name', 'latitude', and 'longitude'
+          friends = data.cast<Map<String, dynamic>>();
+          filteredFriends = friends; // Show full list initially
         });
       } else {
-        // 오류 처리
+        // Error handling
         print('Failed to load friends');
       }
     } catch (e) {
       print('Error: $e');
     } finally {
       setState(() {
-        isLoading = false; // 로딩 완료
+        isLoading = false; // Loading complete
       });
     }
   }
 
-  // 검색 필터링
+  // Search filter
   void _filterFriends(String query) {
-    List<String> results = [];
+    List<Map<String, dynamic>> results = [];
     if (query.isEmpty) {
       results = friends;
     } else {
       results = friends
           .where((friend) =>
-          friend.toLowerCase().contains(query.toLowerCase())) // 대소문자 구분 없이 검색
+          friend['name'].toLowerCase().contains(query.toLowerCase())) // Search by name
           .toList();
     }
     setState(() {
@@ -69,7 +70,7 @@ class _FriendLocationState extends State<FriendLocation> {
     });
   }
 
-  // 확인 버튼 눌렀을 때 동작
+  // Confirm button action
   void _search() {
     _filterFriends(searchController.text);
   }
@@ -87,13 +88,25 @@ class _FriendLocationState extends State<FriendLocation> {
     }
   }
 
+  // Move the map to the selected friend's location
+  void _moveToFriendLocation(double latitude, double longitude) {
+    if (_mapController != null){
+      _mapController!.updateCamera(
+        NCameraUpdate.scrollAndZoomTo( target : NLatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+        ),
+
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
       title: Text('내 친구 찾기'),
+
       body: Column(
         children: [
-          if (isLoading) // 로딩 중일 때
+          if (isLoading) // Show loading indicator
             Center(child: CircularProgressIndicator())
           else
             ...[
@@ -110,7 +123,7 @@ class _FriendLocationState extends State<FriendLocation> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 10.0), // 검색 필드와 버튼 간의 간격
+                    SizedBox(width: 10.0), // Space between search field and button
                     ElevatedButton(
                       onPressed: _search,
                       child: Text('확인'),
@@ -128,10 +141,10 @@ class _FriendLocationState extends State<FriendLocation> {
                 ),
               ),
               SizedBox(height: 50.0),
-              // Adjust the space between the box and the map
-              if (_currentPosition != null) // 지도 표시
+
+              if (_currentPosition != null) // Display map if the location is available
                 Flexible(
-                  flex: 15, // 지도 크기 조절
+                  flex: 15, // Map size control
                   child: NaverMap(
                     options: NaverMapViewOptions(
                       initialCameraPosition: NCameraPosition(
@@ -150,12 +163,17 @@ class _FriendLocationState extends State<FriendLocation> {
                   ),
                 ),
               Expanded(
-                flex: 4, // Adjust flex value to control the list's size
+                flex: 4, // List size control
                 child: ListView.builder(
                   itemCount: filteredFriends.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(filteredFriends[index]),
+                      title: Text(filteredFriends[index]['name']), // Display friend's name
+                      onTap: () {
+                        double latitude = filteredFriends[index]['latitude'];
+                        double longitude = filteredFriends[index]['longitude'];
+                        _moveToFriendLocation(latitude, longitude); // Move map to friend's location
+                      },
                     );
                   },
                 ),

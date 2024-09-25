@@ -1,10 +1,10 @@
 import 'package:aiml_mobile_2024/firebase_options.dart';
+import 'package:aiml_mobile_2024/screens/AddFriend.dart';
+import 'package:aiml_mobile_2024/screens/MyPage.dart';
 import 'package:aiml_mobile_2024/screens/FriendsList.dart';
 import 'package:aiml_mobile_2024/screens/JoinMember.dart';
-import 'package:aiml_mobile_2024/screens/MyPage.dart';
 import 'package:aiml_mobile_2024/screens/Navigation.dart';
 import 'package:aiml_mobile_2024/screens/Sample_showData.dart';
-import 'package:aiml_mobile_2024/screens/Navigation_Naver.dart';
 import 'package:aiml_mobile_2024/screens/ShelterLocation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +16,7 @@ import 'screens/Address.dart';
 import 'screens/ShelterLocation.dart';
 import 'screens/InfraLocation.dart';
 import '../screens/FriendsLocation.dart';
+import '../screens/BeforeMember.dart';
 
 
 void main() async {
@@ -43,6 +44,9 @@ class MyApp extends StatelessWidget {
         '/search_missing_person': (context) => FriendLocation(),
         '/message': (context) => ShowCustomSearchMessage(),
         '/MyPage' : (context) => MyPage(),
+        '/Signup': (context) => JoinMember(),
+        '/login': (context)=>Login(),
+        '/AddFriend':(context)=>AddFriend(),
       },
     );
   }

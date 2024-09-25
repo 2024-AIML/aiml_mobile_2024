@@ -1,86 +1,117 @@
 import 'package:aiml_mobile_2024/widget/CommonScaffold.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'dart:io';
+import 'dart:convert'; // For JSON decoding
+import 'package:http/http.dart' as http; // For making HTTP requests
+import '../widget/CommonScaffold.dart';
 
-class MyPage extends StatefulWidget{
-  //const Member({Key? key}) : super(key: key);
+class MyPage extends StatefulWidget {
   @override
   _MyPageState createState() => _MyPageState();
 }
 
 class _MyPageState extends State<MyPage> {
+  String name = '홍길동 님'; // Default values
+  String phoneNum = '010-1234-5678';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserInfo();
+  }
+
+  Future<void> fetchUserInfo() async {
+    final response = await http.get(Uri.parse('http://localhost:8081/UserInfo/get?name=Kim'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        name = data['name']; // Fetch and update the name
+        phoneNum = data['phoneNum']; // Fetch and update the phone number
+      });
+    } else {
+      // Handle error
+      print('Failed to load user info');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      title: Text("내 정보"),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Container(
-            decoration: BoxDecoration(
-              //border: Border.all(color: Colors.black),
-              borderRadius: BorderRadius.circular(10.0),
-              color: Color(0xffD9D9D9),
-            ),
-            margin: EdgeInsets.all(20.0),
-            padding: EdgeInsets.all(20.0),
+      title: Text('MyPage'),
+      body: Align(
+        alignment: Alignment(0.0, -0.6),
+        child: Container(
+          width: 385, // Box width
+          height: 208, // Box height
+          color: Colors.grey[200], // Box color
+          child: Padding(
+            padding: EdgeInsets.only(top: 10.0),
             child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
                 Container(
-                  width: 400,
-                  height: 55,
-                  // margin: EdgeInsets.only(right: .0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  // padding: EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      SizedBox(height: 5.0,),
-                      Text(
-                        '홍길동',
-                        style: TextStyle(fontSize: 16.0,),
-                        textAlign: TextAlign.right,
+                  width: 372,
+                  height: 148,
+                  color: Color(0xFFCECECE),
+                  child: Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(left: 30.0),
+                        child: ClipOval(
+                          child: Container(
+                            width: 100,
+                            height: 100,
+                            color: Colors.white,
+                            child: Image.asset(
+                              'assets/image/user.png',
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
                       ),
-                      SizedBox(height: 5.0,),
-                      Text(
-                        'AAA @ email.com',
-                        style: TextStyle(fontSize: 11.0, color: Colors.grey),
+                      SizedBox(width: 20), // Spacing between image and text
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            '$name', // Display fetched name
+                            style: TextStyle(
+                              fontSize: 18.0,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            '$phoneNum', // Display fetched phone number
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: 20.0),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        //color: Colors.yellow,
-                      ),
-                      child: TextButton(
-                        onPressed: () {
-                          // 첫 번째 버튼 동작
-                        },
-                        child: Text('개인정보수정',
-                          style: TextStyle(fontSize: 11.0),
-                        ),
-                      ),
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    ElevatedButton(
+                      onPressed: () {
+                        // Navigate to personal info page
+                      },
+                      child: Text('개인정보 수정'),
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                        //color: Colors.yellow,
-                      ),
-                      child: TextButton(
-                        onPressed: () {
-                          // 두 번째 버튼 동작
-                        },
-                        child: Text('로그아웃',
-                          style: TextStyle(fontSize: 11.0),
-                        ),
-                      ),
+                    SizedBox(width: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Navigate to login page
+                        Navigator.pushNamed(context, '/login'); // Example navigation
+                      },
+                      child: Text('로그아웃'),
                     ),
                   ],
                 ),
