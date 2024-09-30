@@ -1,3 +1,5 @@
+import 'package:aiml_mobile_2024/screens/HomeScreen.dart';
+import 'package:aiml_mobile_2024/screens/JoinMember.dart';
 import 'package:aiml_mobile_2024/widget/CommonScaffold.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,9 @@ import 'dart:io';
 import 'dart:convert'; // For JSON decoding
 import 'package:http/http.dart' as http; // For making HTTP requests
 import '../widget/CommonScaffold.dart';
+import 'package:aiml_mobile_2024/screens/LogIn.dart';
+import 'package:aiml_mobile_2024/screens/ChangeInfo.dart';
+
 
 class MyPage extends StatefulWidget {
   @override
@@ -101,15 +106,21 @@ class _MyPageState extends State<MyPage> {
                   children: <Widget>[
                     ElevatedButton(
                       onPressed: () {
-                        // Navigate to personal info page
+                        //정보수정페이지
+                        //Navigator.push(
+                          //context,
+                          //MaterialPageRoute(builder: (context) => ChangeInfo(documentId:documentId),),
+                        //);
                       },
-                      child: Text('개인정보 수정'),
+                      child: Text('회원정보 수정'),
                     ),
                     SizedBox(width: 20),
                     ElevatedButton(
                       onPressed: () {
-                        // Navigate to login page
-                        Navigator.pushNamed(context, '/login'); // Example navigation
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                        );
                       },
                       child: Text('로그아웃'),
                     ),
