@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:aiml_mobile_2024/screens/AddFriend.dart';
+import 'package:aiml_mobile_2024/screens/Address.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_naver_map/flutter_naver_map.dart';
@@ -99,11 +101,25 @@ class _FriendLocationState extends State<FriendLocation> {
     }
   }
 
+  void _showAddFriendDialog(BuildContext context){
+Navigator.push(
+  context,
+  MaterialPageRoute(builder: (context)=>AddFriend(),),
+);
+  }
+
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
       title: Text('내 친구 찾기'),
-
+      actions: [
+        IconButton(
+          icon: Icon(Icons.person_add),
+          onPressed: () {
+            _showAddFriendDialog(context);
+          },
+        ),
+      ],
       body: Column(
         children: [
           if (isLoading) // Show loading indicator
@@ -133,14 +149,6 @@ class _FriendLocationState extends State<FriendLocation> {
               ),
               SizedBox(height: 50.0),
 
-              Container(
-                height: 100.0,
-                color: Colors.grey[300],
-                child: Center(
-                  child: Text('여기에 친구 개인정보'),
-                ),
-              ),
-              SizedBox(height: 50.0),
 
               if (_currentPosition != null) // Display map if the location is available
                 Flexible(

@@ -17,6 +17,7 @@ import 'screens/ShelterLocation.dart';
 import 'screens/InfraLocation.dart';
 import '../screens/FriendsLocation.dart';
 import '../screens/BeforeMember.dart';
+import '../screens/ChangeInfo.dart';
 
 
 void main() async {
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
         '/Signup': (context) => JoinMember(),
         '/login': (context)=>Login(),
         '/AddFriend':(context)=>AddFriend(),
+        //'/ChangeInfo':(context)=>ChangeInfo(documentId: documentId),
       },
     );
   }

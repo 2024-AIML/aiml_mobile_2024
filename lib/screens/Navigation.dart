@@ -1,6 +1,7 @@
 // import 'dart:html';
 
 import 'package:aiml_mobile_2024/widget/BottomNavigationBarWidget.dart';
+import 'package:aiml_mobile_2024/widget/CommonScaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -24,11 +25,8 @@ class _NavigationState extends State<Navigation> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Navigation',
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Color(0xffD9D9D9),
-        ),
+      home: CommonScaffold(title: Text('Navigation'),
+
         body: Center(
           child: ElevatedButton(
 //            onPressed: _launchURL,
@@ -38,7 +36,6 @@ class _NavigationState extends State<Navigation> {
             child: Text('Open URL Scheme'),
           ),
         ),
-        bottomNavigationBar: BottomNavigationBarWidget(),
       ),
     );
   }
