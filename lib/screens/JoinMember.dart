@@ -92,7 +92,10 @@ class _JoinMemberState extends State<JoinMember> {
                   controller: nameController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: "이름을 입력하세요"
+                      hintText: "이름을 입력하세요",
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color:Colors.green[900]!,)
+                      )
                   ),
                 ),
               ),
@@ -105,7 +108,10 @@ class _JoinMemberState extends State<JoinMember> {
                   controller: phoneController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: "핸드폰 번호를 입력하세요"
+                      hintText: "핸드폰 번호를 입력하세요",
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color:Colors.green[900]!,)
+                      )
                   ),
                 ),
               ),
@@ -120,7 +126,10 @@ class _JoinMemberState extends State<JoinMember> {
                       controller: id1Controller,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(),
-                          hintText: "생년월일 6자리"
+                          hintText: "생년월일 6자리",
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color:Colors.green[900]!,)
+                          )
                       ),
                     ),
                   ),
@@ -131,7 +140,10 @@ class _JoinMemberState extends State<JoinMember> {
                       controller: id2Controller,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(),
-                          hintText: "뒷자리 7자리"
+                          hintText: "뒷자리 7자리",
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color:Colors.green[900]!,)
+                          )
                       ),
                       obscureText: true,
                     ),
@@ -148,7 +160,10 @@ class _JoinMemberState extends State<JoinMember> {
                   controller: emailController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: "이메일을 입력하세요"
+                      hintText: "이메일을 입력하세요",
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color:Colors.green[900]!,)
+                      )
                   ),
                 ),
               ),
@@ -161,7 +176,10 @@ class _JoinMemberState extends State<JoinMember> {
                   controller: pwController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: "비밀번호를 입력하세요"
+                      hintText: "비밀번호를 입력하세요",
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color:Colors.green[900]!,)
+                      )
                   ),
                   obscureText: true,
                 ),
@@ -175,7 +193,10 @@ class _JoinMemberState extends State<JoinMember> {
                   controller: checkController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
-                    hintText: "비밀번호를 한 번 더 입력하세요"
+                    hintText: "비밀번호를 한 번 더 입력하세요",
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color:Colors.green[900]!,)
+                      )
                   ),
                   obscureText: true,
                 ),
@@ -202,6 +223,7 @@ class _JoinMemberState extends State<JoinMember> {
                   //chk' : chk,
                   registerUserToFirestore(name, email, phone, id1, id2, pw);
                 },
+                style: ElevatedButton.styleFrom(backgroundColor:Colors.black,foregroundColor: Colors.white),
                 child: Text('회원가입하기'),
               ),
             ],

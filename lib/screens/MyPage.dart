@@ -50,16 +50,16 @@ class _MyPageState extends State<MyPage> {
         child: Container(
           width: 385, // Box width
           height: 208, // Box height
-          color: Colors.grey[200], // Box color
+          color: Colors.white, // Box color
           child: Padding(
             padding: EdgeInsets.only(top: 10.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Container(
-                  width: 372,
-                  height: 148,
-                  color: Color(0xFFCECECE),
+                  width: 360,
+                  height: 140,
+                  color: Colors.white,
                   child: Row(
                     children: <Widget>[
                       Padding(
@@ -108,10 +108,11 @@ class _MyPageState extends State<MyPage> {
                       onPressed: () {
                         //정보수정페이지
                         //Navigator.push(
-                          //context,
-                          //MaterialPageRoute(builder: (context) => ChangeInfo(documentId:documentId),),
+                        //context,
+                        //MaterialPageRoute(builder: (context) => ChangeInfo(documentId:documentId),),
                         //);
                       },
+                      style: ElevatedButton.styleFrom(backgroundColor:Colors.black,foregroundColor: Colors.white),
                       child: Text('회원정보 수정'),
                     ),
                     SizedBox(width: 20),
@@ -122,6 +123,7 @@ class _MyPageState extends State<MyPage> {
                           MaterialPageRoute(builder: (context) => HomeScreen()),
                         );
                       },
+                      style: ElevatedButton.styleFrom(backgroundColor:Colors.black,foregroundColor: Colors.white),
                       child: Text('로그아웃'),
                     ),
                   ],

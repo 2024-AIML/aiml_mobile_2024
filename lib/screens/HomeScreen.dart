@@ -23,12 +23,12 @@ class HomeScreen extends StatelessWidget {
                 Navigator.pushNamed(context, '/login'); // Replace with your login route
               },
               child: Container(
-                width: 200, // Adjust width to your preference
+                width: 300, // Adjust width to your preference
                 height: 60,  // Adjust height to your preference
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: Colors.deepPurple, // Background color
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
+                  color: Colors.green[900], // Background color
+                  borderRadius: BorderRadius.circular(20), // Rounded corners
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black26,
@@ -53,12 +53,12 @@ class HomeScreen extends StatelessWidget {
                 Navigator.pushNamed(context, '/Signup'); // Replace with your sign-up route
               },
               child: Container(
-                width: 200, // Adjust width to your preference
+                width: 300, // Adjust width to your preference
                 height: 60,  // Adjust height to your preference
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: Colors.deepPurple, // Background color
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
+                  color: Colors.green[900], // Background color
+                  borderRadius: BorderRadius.circular(20), // Rounded corners
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black26,

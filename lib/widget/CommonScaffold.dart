@@ -24,7 +24,9 @@ class CommonScaffold extends StatelessWidget {
       body: body,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Color(0xffD9D9D9),
+        backgroundColor: Color(0xffD212121),
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.white,
         onTap: (int index) {
           switch (index) {
             case 0:

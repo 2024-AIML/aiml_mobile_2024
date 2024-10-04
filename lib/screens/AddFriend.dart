@@ -66,7 +66,12 @@ class AddFriend extends StatelessWidget {
               controller: _controller,
               decoration: InputDecoration(
                 labelText: 'Enter Information',
+                  labelStyle: TextStyle(
+                    color: Colors.green[900], // Set the label color to green
+                  ),
                 hintText: '상대방의 전화번호, 이름, 이메일 중 하나를 입력하세요',
+                focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color:Colors.green[900]!,))
               ),
             ),
             SizedBox(height: 20),
@@ -116,7 +121,8 @@ class AddFriend extends StatelessWidget {
                   ),
                 );
               },
-              child: Text('Search'),
+              style: ElevatedButton.styleFrom(backgroundColor:Colors.black,foregroundColor: Colors.white),
+              child: Text('찾기'),
             ),
           ],
         ),

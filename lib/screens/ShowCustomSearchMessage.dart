@@ -54,10 +54,12 @@ class _ShowCustomSearchMessageState extends State<ShowCustomSearchMessage> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       labelText: '검색',
+                      labelStyle: TextStyle(color: Colors.green[900]),
                       hintText: '지역 이름을 입력하세요',
                       prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
+                      focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        borderSide: BorderSide(color:Colors.green[900]!),
                       ),
                     ),
                   ),
@@ -65,7 +67,8 @@ class _ShowCustomSearchMessageState extends State<ShowCustomSearchMessage> {
                 SizedBox(width: 5.0),
                 ElevatedButton(
                   onPressed: _search,
-                  child: Text('확인'),
+                  style: ElevatedButton.styleFrom(backgroundColor:Colors.black,foregroundColor: Colors.white),
+                  child: Icon(Icons.search),
                 ),
               ],
             ),
@@ -76,6 +79,13 @@ class _ShowCustomSearchMessageState extends State<ShowCustomSearchMessage> {
               itemBuilder: (context, index) {
                 return Card(
                   margin: EdgeInsets.all(10.0),
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(
+                      color:Colors.black,
+                      width: 2.0,
+                    ),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
                   child: Padding(
                     padding: EdgeInsets.all(15.0),
                     child: Text(

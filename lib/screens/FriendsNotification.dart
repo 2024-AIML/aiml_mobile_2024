@@ -80,6 +80,7 @@ class NotificationsPage extends StatelessWidget {
                         onPressed: () {
                           // 친구 수락 버튼을 눌렀을 때 수행할 작업을 여기에 추가하세요.
                         },
+                        style: ElevatedButton.styleFrom(backgroundColor:Colors.black,foregroundColor: Colors.white),
                         child: Text('친구 수락'),
                       ),
                       onTap: () {
