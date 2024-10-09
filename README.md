@@ -1,16 +1,6 @@
-# wow
+# 2024년 AIML 응용프로젝트 mobile 리포지토리
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+#### 2024.10.10
+- 아직 flutter_naver_map 사용하는 거 해결 못 했음 (FriendsLocation, Navigation, ShelterLocation)
+- 친구 요청 기능 사용할 때 로그인 된 사람 정보 받아오는 거 해야함 ! 
+- 명우 오빠 firebase DB 구조 한 번 맞추기
