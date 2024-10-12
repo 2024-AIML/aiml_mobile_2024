@@ -7,6 +7,7 @@ class CommonScaffold extends StatelessWidget {
   final Widget title;
   final List<Widget>? actions;
 
+
   const CommonScaffold({
     Key? key,
     required this.title,

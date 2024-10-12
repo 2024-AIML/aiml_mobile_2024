@@ -1,11 +1,13 @@
 import 'package:aiml_mobile_2024/firebase_options.dart';
 import 'package:aiml_mobile_2024/screens/AddFriend.dart';
+import 'package:aiml_mobile_2024/screens/MorseCode.dart';
 import 'package:aiml_mobile_2024/screens/MyPage.dart';
 import 'package:aiml_mobile_2024/screens/FriendsList.dart';
 import 'package:aiml_mobile_2024/screens/JoinMember.dart';
 import 'package:aiml_mobile_2024/screens/Navigation.dart';
 import 'package:aiml_mobile_2024/screens/Sample_showData.dart';
 import 'package:aiml_mobile_2024/screens/ShelterLocation.dart';
+import 'package:aiml_mobile_2024/service/LocationUpdate.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
@@ -18,6 +20,7 @@ import 'screens/InfraLocation.dart';
 import '../screens/FriendsLocation.dart';
 import '../screens/BeforeMember.dart';
 import '../screens/ChangeInfo.dart';
+import 'package:aiml_mobile_2024/service/LocationUpdate.dart';
 
 
 void main() async {
