@@ -115,6 +115,7 @@ class _FriendLocationState extends State<FriendLocation> {
       ],
       body: Stack(
         children: [
+          // Map
           if (_currentPosition != null)
             NaverMap(
               options: NaverMapViewOptions(
@@ -132,46 +133,61 @@ class _FriendLocationState extends State<FriendLocation> {
                 });
               },
             ),
+          // Loading Indicator
           if (isLoading)
-            Center(child: CircularProgressIndicator())
-          else
-            Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  height: 60, // Set a fixed height for better control
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: searchController,
-                          decoration: InputDecoration(
-                            labelText: '검색',
-                            labelStyle: TextStyle(color: Colors.green[900]),
-                            hintText: '친구 이름을 입력하세요',
-                            prefixIcon: Icon(Icons.search),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                              borderSide: BorderSide(color:Colors.green[900]!),
-                            ),
+            Center(child: CircularProgressIndicator()),
+          // Search Bar
+          Positioned(
+            top: 50, // Adjust as needed
+            left: 0,
+            right: 0,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                height: 60,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: searchController,
+                        decoration: InputDecoration(
+                          labelText: '검색',
+                          labelStyle: TextStyle(color: Colors.green[900]),
+                          hintText: '친구 이름을 입력하세요',
+                          prefixIcon: Icon(Icons.search),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderSide: BorderSide(color: Colors.green[900]!),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderSide: BorderSide(color: Colors.grey),
                           ),
                         ),
                       ),
-                      SizedBox(width: 10.0),
-                      ElevatedButton(
-                        onPressed: _search,
-                        style: ElevatedButton.styleFrom(backgroundColor:Colors.black,foregroundColor: Colors.white),
-                        child: Icon(Icons.search),
+                    ),
+                    SizedBox(width: 10.0),
+                    ElevatedButton(
+                      onPressed: _search,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
                       ),
-                    ],
-                  ),
+                      child: Icon(Icons.search),
+                    ),
+                  ],
                 ),
               ),
             ),
-          Expanded(
+          ),
+          // List of Friends
+          Positioned(
+            top: 110, // Adjust according to your design
+            bottom: 0,
+            left: 0,
+            right: 0,
             child: ListView.builder(
-              padding: const EdgeInsets.only(top: 80.0),
+              padding: EdgeInsets.zero,
               itemCount: filteredFriends.length,
               itemBuilder: (context, index) {
                 return ListTile(
@@ -190,6 +206,3 @@ class _FriendLocationState extends State<FriendLocation> {
     );
   }
 }
-
-
-

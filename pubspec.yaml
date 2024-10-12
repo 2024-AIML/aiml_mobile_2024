@@ -75,6 +75,7 @@ flutter:
   assets:
     - assets/shelters/shelters.csv
     - assets/image/user.png
+    - assets/image/disaster.png
 
 
   #   - images/a_dot_burr.jpeg

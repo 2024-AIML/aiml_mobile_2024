@@ -4,16 +4,15 @@ import 'package:aiml_mobile_2024/screens/LogIn.dart';
 import 'package:aiml_mobile_2024/screens/MorseCode.dart';
 import 'package:aiml_mobile_2024/screens/MyPage.dart';
 import 'package:aiml_mobile_2024/screens/FriendsNotification.dart';
+import 'package:aiml_mobile_2024/screens/Guidelines.dart';
 import 'package:flutter/material.dart';
 import '../widget/CommonScaffold.dart'; // CommonScaffold.dart file import
 
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(''),
-      ),
+    return CommonScaffold(
+      title:Text('') ,
       body: Stack(
         children: [
           // Main content of the screen
@@ -228,7 +227,7 @@ void _showMenu(BuildContext context) {
     Navigator.pop(context);
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AddFriend()),);
+      MaterialPageRoute(builder: (context) => GuidelinePage()),);
   }
   )
           ],

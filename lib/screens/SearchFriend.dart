@@ -16,7 +16,7 @@ class SearchFriend extends StatefulWidget {
 }
 
 class _SearchFriendState extends State<SearchFriend> {
-  TextEditingController searchController = TextEditingController();
+  final TextEditingController searchController = TextEditingController();
   bool isLoading = false;
 
   void _filterFriends(String query) {
