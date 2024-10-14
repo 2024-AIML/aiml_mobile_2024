@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore 패키지 추가
-import '../screens/FriendsNotification.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'FriendsNotification.dart';
 
 class AddFriend extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
@@ -50,6 +51,7 @@ class AddFriend extends StatelessWidget {
     return '$username@$domain';
   }
 
+
   Future<void> sendFriendRequest(BuildContext context, String currentUserId, String friendUserId) async {
     try {
       // 친구의 document 참조
@@ -88,11 +90,13 @@ class AddFriend extends StatelessWidget {
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Friend'),
+        title: Text('친구 추가'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -101,14 +105,19 @@ class AddFriend extends StatelessWidget {
             TextField(
               controller: _controller,
               decoration: InputDecoration(
-                labelText: 'Enter Information',
-                hintText: '상대방의 전화번호, 이름, 이메일 중 하나를 입력하세요',
+                  labelText: '추가하고 싶은 사람의 정보를 입력하세요.',
+                  labelStyle: TextStyle(
+                    color: Colors.black, // Set the label color to green
+                  ),
+                  hintText: '상대방의 전화번호, 이름, 이메일 중 하나를 입력하세요',
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color:Colors.green[900]!,))
               ),
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
-                String searchQuery = _controller.text.trim();
+                String searchQuery = _controller.text;
                 print('Search Query: $searchQuery');
 
                 // 사용자 검색
@@ -137,7 +146,7 @@ class AddFriend extends StatelessWidget {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text('Search Results'),
+                      title: Text('검색 결과'),
                       content: Container(
                         width: double.maxFinite,
                         height: 300,
@@ -173,7 +182,14 @@ class AddFriend extends StatelessWidget {
                   );
                 }
               },
-              child: Text('Search'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green[900],
+              ),
+              child: Text(
+                  '검색',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),),
             ),
           ],
         ),
@@ -185,8 +201,9 @@ class AddFriend extends StatelessWidget {
             MaterialPageRoute(builder: (context) => NotificationsPage(senderUserId: '',)),
           );
         },
-        child: Icon(Icons.notifications),
+        child: Icon(Icons.notifications, color: Colors.white,),
         tooltip: 'Notifications',
+        backgroundColor: Colors.green[900],
       ),
     );
   }

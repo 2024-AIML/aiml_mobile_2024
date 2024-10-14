@@ -1,7 +1,9 @@
-import '../screens/JoinMember.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../widget/CommonScaffold.dart';
+import 'JoinMember.dart';
 
 class Login extends StatefulWidget{
   @override
@@ -33,10 +35,8 @@ class _LoginState extends State<Login>{
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('로그인'),
-      ),
+    return CommonScaffold(
+      title: Text('로그인'),
       body: Padding(
         padding: EdgeInsets.all(20.0),
         child: Column(
@@ -51,7 +51,10 @@ class _LoginState extends State<Login>{
                 controller: _emailContoller,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(),
-                    hintText: "이메일을 입력하세요"
+                    hintText: "이메일을 입력하세요",
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color:Colors.green[900]!,)
+                    )
                 ),
               ),
             ),
@@ -63,8 +66,11 @@ class _LoginState extends State<Login>{
               child: TextField(
                 controller: _pwController,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: "비밀번호를 입력하세요",
+                    border: OutlineInputBorder(),
+                    hintText: "비밀번호를 입력하세요",
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color:Colors.green[900]!,)
+                    )
                 ),
                 obscureText: true,
               ),
@@ -75,6 +81,7 @@ class _LoginState extends State<Login>{
               onPressed: (){
 
               },
+              style: ElevatedButton.styleFrom(backgroundColor:Colors.black,foregroundColor: Colors.white),
               child: Text('로그인'),
             ),
             SizedBox(height: 10.0,),
@@ -85,6 +92,7 @@ class _LoginState extends State<Login>{
                   MaterialPageRoute(builder: (context) => JoinMember()),
                 );
               },
+              style: ElevatedButton.styleFrom(backgroundColor:Colors.black,foregroundColor: Colors.white),
               child: Text('회원가입'),
             ),
           ],

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../service/FriendService.dart'; // FriendService 임포트
+
+import '../service/FriendService.dart';
 
 class NotificationsPage extends StatelessWidget {
-  final String currentUserId = 'user01'; // 현재 로그인한 사용자 ID
+  final String currentUserId = 'user01'; // 현재 로그인한 사용자 ID 라서 나중에 바꿔야함
   final String senderUserId;
 
   NotificationsPage({required this.senderUserId});
@@ -21,6 +22,7 @@ class NotificationsPage extends StatelessWidget {
             .collection('notifications')
             .doc('unchecked')
             .snapshots(),
+
         builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -28,14 +30,18 @@ class NotificationsPage extends StatelessWidget {
           if (!snapshot.hasData || snapshot.data!.data() == null) {
             return Center(child: Text('받은 알림이 없습니다.'));
           }
-
-          Map<String, dynamic> uncheckedData =
-          snapshot.data!.data() as Map<String, dynamic>;
+          Map<String, dynamic> uncheckedData = snapshot.data!.data() as Map<String, dynamic>;
           if (uncheckedData.isEmpty) {
             return Center(child: Text('받은 알림이 없습니다.'));
           }
 
           List<String> userIDs = uncheckedData.keys.toList();
+
+          // 필드 내용 출력
+          print('Notifications:');
+          uncheckedData.forEach((key, value) {
+            print('$key: $value');
+          });
 
           return ListView.builder(
             itemCount: userIDs.length,
@@ -52,6 +58,7 @@ class NotificationsPage extends StatelessWidget {
                   }
 
                   String userName = '사용자 이름 없음';
+                  // 사용자 컬렉션에서 userID와 일치하는 문서를 찾아서 해당 문서의 name 필드 값을 가져옴
                   for (QueryDocumentSnapshot userDoc in usersSnapshot.data!.docs) {
                     if (userDoc.id == userID) {
                       userName = userDoc.get('name') ?? '사용자 이름 없음';
@@ -59,9 +66,23 @@ class NotificationsPage extends StatelessWidget {
                     }
                   }
 
+                  // // 필드 내용과 일치하는 문서가 있는지 확인하는 과정 출력
+                  // print('Checking for user $userID in user collection:');
+                  // bool foundUser = false;
+                  // for (QueryDocumentSnapshot userDoc in usersSnapshot.data!.docs) {
+                  //   if (userDoc.id == userID) {
+                  //     print('User $userID found in user collection');
+                  //     foundUser = true;
+                  //     break;
+                  //   }
+                  // }
+                  // if (!foundUser) {
+                  //   print('User $userID not found in user collection');
+                  // }
+
                   return Card(
                     child: ListTile(
-                      title: Text('사용자 이름: $userName'),
+                      title: Text('User Name: $userName'),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [

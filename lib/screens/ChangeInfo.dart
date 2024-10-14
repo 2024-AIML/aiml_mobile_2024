@@ -1,17 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import '../widget/CommonScaffold.dart';
 import 'HomeScreen.dart';
 
+//회원정보 수정하는 페이지
 
-class JoinMember extends StatefulWidget {
+class ChangeInfo extends StatefulWidget {
+  final String documentId; // Pass the document ID to identify the user
+
+  ChangeInfo({required this.documentId});
+
   @override
-  _JoinMemberState createState() => _JoinMemberState();
+  _ChangeInfoState createState() => _ChangeInfoState();
 }
 
-class _JoinMemberState extends State<JoinMember> {
+class _ChangeInfoState extends State<ChangeInfo> {
   String _selectedGender = '남자';
   String _selectedSpecial = '해당 없음';
 
@@ -23,39 +27,67 @@ class _JoinMemberState extends State<JoinMember> {
   TextEditingController pwController = TextEditingController();
   TextEditingController checkController = TextEditingController();
 
-  Future<void> registerUserToFirestore(String name, String email, String phone, String id1, String id2, String pw) async{
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
     try {
-      CollectionReference _user = FirebaseFirestore.instance.collection('user');
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('user')
+          .doc(widget.documentId)
+          .get();
 
-      String lastFourDigits = phoneController.text.substring(phoneController.text.length - 4);
-      String documentId = '${lastFourDigits}_${name}';
+      if (userSnapshot.exists) {
+        Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
 
-      // 사용자 정보 추가
-      await _user.doc(documentId).set({
-        'name': name,
-        'email': email,
-        'phone' : phone,
-        'id1' : id1,
-        'id2' : id2,
-        'pw' : pw,
-      });
-      print('사용자 정보가 성공적으로 등록되었습니다!');
-      _showRegistrationSuccessDialog();
 
-      // 사용자 정보 추가 후 필드 초기화
+        setState(() {
+          nameController.text = userData['name'] ?? '';
+          phoneController.text = userData['phone'] ?? '';
+          id1Controller.text = userData['id1'] ?? '';
+          id2Controller.text = userData['id2'] ?? '';
+          emailController.text = userData['email'] ?? '';
+          pwController.text = userData['pw'] ?? '';
+          _selectedGender = userData['gender'] ?? '남자';
+          _selectedSpecial = userData['special'] ?? '해당 없음';
+        });
+      }
     } catch (e) {
-      // 에러 처리
-      print('사용자 정보 등록 중 오류가 발생했습니다.');
-      print(e.toString());
+      print('Error fetching user data: $e');
     }
   }
 
-  void _showRegistrationSuccessDialog() {
+  Future<void> _updateUserInfo() async {
+    try {
+      CollectionReference _user = FirebaseFirestore.instance.collection('user');
+
+      // 사용자 정보를 갱신
+      await _user.doc(widget.documentId).update({
+        'name': nameController.text,
+        'email': emailController.text,
+        'phone': phoneController.text,
+        'id1': id1Controller.text,
+        'id2': id2Controller.text,
+        'pw': pwController.text,
+        'gender': _selectedGender,
+        'special': _selectedSpecial,
+      });
+      print('User information updated successfully!');
+      _showUpdateSuccessDialog();
+    } catch (e) {
+      print('Error updating user information: $e');
+    }
+  }
+
+  void _showUpdateSuccessDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('회원가입이 완료되었습니다.'),
+          title: Text('회원정보가 성공적으로 수정되었습니다.'),
           actions: <Widget>[
             TextButton(
               child: Text('확인'),
@@ -75,16 +107,14 @@ class _JoinMemberState extends State<JoinMember> {
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      title: Text('회원가입'),
+      title: Text('회원정보 수정'),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-
               SizedBox(height: 10.0),
-
               fieldTitle('이름'),
               SizedBox(
                 width: 25.0,
@@ -92,10 +122,7 @@ class _JoinMemberState extends State<JoinMember> {
                   controller: nameController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: "이름을 입력하세요",
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color:Colors.green[900]!,)
-                      )
+                      hintText: "이름을 입력하세요"
                   ),
                 ),
               ),
@@ -108,10 +135,7 @@ class _JoinMemberState extends State<JoinMember> {
                   controller: phoneController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: "핸드폰 번호를 입력하세요",
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color:Colors.green[900]!,)
-                      )
+                      hintText: "핸드폰 번호를 입력하세요"
                   ),
                 ),
               ),
@@ -126,10 +150,7 @@ class _JoinMemberState extends State<JoinMember> {
                       controller: id1Controller,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(),
-                          hintText: "생년월일 6자리",
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color:Colors.green[900]!,)
-                          )
+                          hintText: "생년월일 6자리"
                       ),
                     ),
                   ),
@@ -140,17 +161,13 @@ class _JoinMemberState extends State<JoinMember> {
                       controller: id2Controller,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(),
-                          hintText: "뒷자리 7자리",
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color:Colors.green[900]!,)
-                          )
+                          hintText: "뒷자리 7자리"
                       ),
                       obscureText: true,
                     ),
                   ),
                 ],
               ),
-
               SizedBox(height: 10.0),
 
               fieldTitle('이메일'),
@@ -160,10 +177,7 @@ class _JoinMemberState extends State<JoinMember> {
                   controller: emailController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: "이메일을 입력하세요",
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color:Colors.green[900]!,)
-                      )
+                      hintText: "이메일을 입력하세요"
                   ),
                 ),
               ),
@@ -176,10 +190,7 @@ class _JoinMemberState extends State<JoinMember> {
                   controller: pwController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: "비밀번호를 입력하세요",
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color:Colors.green[900]!,)
-                      )
+                      hintText: "비밀번호를 입력하세요"
                   ),
                   obscureText: true,
                 ),
@@ -193,10 +204,7 @@ class _JoinMemberState extends State<JoinMember> {
                   controller: checkController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: "비밀번호를 한 번 더 입력하세요",
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color:Colors.green[900]!,)
-                      )
+                      hintText: "비밀번호를 한 번 더 입력하세요"
                   ),
                   obscureText: true,
                 ),
@@ -212,47 +220,19 @@ class _JoinMemberState extends State<JoinMember> {
               specialRadioTile('해당 없음'),
               specialRadioTile('뭔가... 뭔가다'),
               ElevatedButton(
-                onPressed: () {
-                  String name = nameController.text;
-                  String email = emailController.text;
-                  String phone = phoneController.text;
-                  String id1 = id1Controller.text;
-                  String id2 = id2Controller.text;
-                  String pw = pwController.text;
-
-                  //chk' : chk,
-                  registerUserToFirestore(name, email, phone, id1, id2, pw);
-                },
-                style: ElevatedButton.styleFrom(backgroundColor:Colors.black,foregroundColor: Colors.white),
-                child: Text('회원가입하기'),
+                onPressed: _updateUserInfo, // Call the update method
+                child: Text('회원정보 수정하기'),
               ),
             ],
           ),
         ),
       ),
-      //context: context,
     );
   }
 
   Widget fieldTitle(String title) => Padding(
     padding: EdgeInsets.only(left: 20.0),
     child: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0)),
-  );
-
-  Widget textFieldHint(String hint, {bool obscureText = false}) => Container(
-    margin: EdgeInsets.symmetric(horizontal: 20.0),
-    padding: EdgeInsets.symmetric(horizontal: 10.0),
-    decoration: BoxDecoration(
-      color: Colors.grey[200],
-      borderRadius: BorderRadius.circular(10.0),
-    ),
-    child: TextFormField(
-      obscureText: obscureText,
-      decoration: InputDecoration(
-        hintText: hint,
-        border: InputBorder.none,
-      ),
-    ),
   );
 
   TextStyle sectionTitleStyle() => TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0);

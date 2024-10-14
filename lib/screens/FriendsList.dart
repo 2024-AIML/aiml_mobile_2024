@@ -109,5 +109,3 @@ class UserFriendsList extends StatelessWidget {
     );
   }
 }
-
-
