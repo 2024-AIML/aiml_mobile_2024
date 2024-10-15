@@ -1034,9 +1034,9 @@ PODS:
     - PromisesObjC (~> 2.1)
   - FirebaseSharedSwift (10.25.0)
   - Flutter (1.0.0)
-  - flutter_naver_map (1.0.0):
+  - flutter_naver_map (1.3.0):
     - Flutter
-    - NMapsMap (= 3.17.0)
+    - NMapsMap (= 3.19.0)
   - geolocator_apple (1.2.0):
     - Flutter
   - GoogleUtilities/AppDelegateSwizzler (7.13.3):
@@ -1143,7 +1143,7 @@ PODS:
   - gRPC-Core/Interface (1.62.5)
   - gRPC-Core/Privacy (1.62.5)
   - GTMSessionFetcher/Core (3.4.1)
-  - kakao_flutter_sdk_common (1.9.2):
+  - kakao_flutter_sdk_common (1.9.5):
     - Flutter
   - leveldb-library (1.22.5)
   - location (0.0.1):
@@ -1153,8 +1153,8 @@ PODS:
     - nanopb/encode (= 2.30910.0)
   - nanopb/decode (2.30910.0)
   - nanopb/encode (2.30910.0)
-  - NMapsGeometry (1.0.1)
-  - NMapsMap (3.17.0):
+  - NMapsGeometry (1.0.2)
+  - NMapsMap (3.19.0):
     - NMapsGeometry
   - path_provider_foundation (0.0.1):
     - Flutter
@@ -1168,6 +1168,7 @@ PODS:
     - Flutter
   - webview_flutter_wkwebview (0.0.1):
     - Flutter
+    - FlutterMacOS
 
 DEPENDENCIES:
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
@@ -1183,7 +1184,7 @@ DEPENDENCIES:
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
-  - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/ios`)
+  - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/darwin`)
 
 SPEC REPOS:
   trunk:
@@ -1239,7 +1240,7 @@ EXTERNAL SOURCES:
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
   webview_flutter_wkwebview:
-    :path: ".symlinks/plugins/webview_flutter_wkwebview/ios"
+    :path: ".symlinks/plugins/webview_flutter_wkwebview/darwin"
 
 SPEC CHECKSUMS:
   abseil: d121da9ef7e2ff4cab7666e76c5a3e0915ae08c3
@@ -1261,24 +1262,24 @@ SPEC CHECKSUMS:
   FirebaseInstallations: 91950fe859846fff0fbd296180909dd273103b09
   FirebaseSharedSwift: 0274086954b1b2d5fd7e829eccc587044d72a4ba
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_naver_map: b18663bc83c2caaab484c58dccf239a87ebbed1b
+  flutter_naver_map: d31b1884517151e7b3121e3b24c18733ef4e4387
   geolocator_apple: 6cbaf322953988e009e5ecb481f07efece75c450
   GoogleUtilities: ea963c370a38a8069cc5f7ba4ca849a60b6d7d15
   "gRPC-C++": e725ef63c4475d7cdb7e2cf16eb0fde84bd9ee51
   gRPC-Core: eee4be35df218649fe66d721a05a7f27a28f069b
   GTMSessionFetcher: 8000756fc1c19d2e5697b90311f7832d2e33f6cd
-  kakao_flutter_sdk_common: 049c9341e325da17ac75751a35646dbbcfa06891
+  kakao_flutter_sdk_common: 985c7085c29a2bd949972cadac8238845dc354db
   leveldb-library: e8eadf9008a61f9e1dde3978c086d2b6d9b9dc28
   location: 3a2eed4dd2fab25e7b7baf2a9efefe82b512d740
   nanopb: 438bc412db1928dac798aa6fd75726007be04262
-  NMapsGeometry: 53c573ead66466681cf123f99f698dc8071a4b83
-  NMapsMap: a5b909a31b6f3d27a670f6eb2ddc913c38975474
+  NMapsGeometry: 4e02554fa9880ef02ed96b075dc84355d6352479
+  NMapsMap: 99c10429d93340780b6f88d3fc7c0a3850b43664
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
-  shared_preferences_foundation: b4c3b4cddf1c21f02770737f147a3f5da9d39695
+  shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
   url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
-  webview_flutter_wkwebview: be0f0d33777f1bfd0c9fdcb594786704dbf65f36
+  webview_flutter_wkwebview: 0982481e3d9c78fd5c6f62a002fcd24fc791f1e4
 
 PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
 
