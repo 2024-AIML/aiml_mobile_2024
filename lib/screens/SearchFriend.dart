@@ -16,7 +16,7 @@ class SearchFriend extends StatefulWidget {
 }
 
 class _SearchFriendState extends State<SearchFriend> {
-  TextEditingController searchController = TextEditingController();
+  final TextEditingController searchController = TextEditingController();
   bool isLoading = false;
 
   void _filterFriends(String query) {
@@ -38,8 +38,9 @@ class _SearchFriendState extends State<SearchFriend> {
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      title: Text("Search Bar"),
+    return Scaffold(
+      appBar: AppBar(
+      title: Text ('Search Bar')),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(

@@ -207,9 +207,8 @@ class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
       }
     }
 
-    return CommonScaffold(
-      title: Text("주변 대피소"),
-      body: Column(
+    return Center(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (_currentPosition != null)
@@ -304,11 +303,12 @@ class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
                         Text(
                           '${shelter.distance.toStringAsFixed(2)} km',
                           overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         SizedBox(width: 20),
                         Text(
                           ' ${shelter.Capacity.toInt()}',
-                          style: TextStyle(color: capacityColor),
+                          style: TextStyle(color: capacityColor,fontWeight: FontWeight.bold),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],

@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../service/FriendService.dart';
+
 class NotificationsPage extends StatelessWidget {
+  final String currentUserId = 'user01'; // 현재 로그인한 사용자 ID 라서 나중에 바꿔야함
+  final String senderUserId;
+
+  NotificationsPage({required this.senderUserId});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,7 +18,7 @@ class NotificationsPage extends StatelessWidget {
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('user')
-            .doc('user01')
+            .doc(currentUserId)
             .collection('notifications')
             .doc('unchecked')
             .snapshots(),
@@ -59,28 +66,42 @@ class NotificationsPage extends StatelessWidget {
                     }
                   }
 
-                  // 필드 내용과 일치하는 문서가 있는지 확인하는 과정 출력
-                  print('Checking for user $userID in user collection:');
-                  bool foundUser = false;
-                  for (QueryDocumentSnapshot userDoc in usersSnapshot.data!.docs) {
-                    if (userDoc.id == userID) {
-                      print('User $userID found in user collection');
-                      foundUser = true;
-                      break;
-                    }
-                  }
-                  if (!foundUser) {
-                    print('User $userID not found in user collection');
-                  }
+                  // // 필드 내용과 일치하는 문서가 있는지 확인하는 과정 출력
+                  // print('Checking for user $userID in user collection:');
+                  // bool foundUser = false;
+                  // for (QueryDocumentSnapshot userDoc in usersSnapshot.data!.docs) {
+                  //   if (userDoc.id == userID) {
+                  //     print('User $userID found in user collection');
+                  //     foundUser = true;
+                  //     break;
+                  //   }
+                  // }
+                  // if (!foundUser) {
+                  //   print('User $userID not found in user collection');
+                  // }
 
                   return Card(
                     child: ListTile(
                       title: Text('User Name: $userName'),
-                      trailing: ElevatedButton(
-                        onPressed: () {
-                          // 친구 수락 버튼을 눌렀을 때 수행할 작업을 여기에 추가하세요.
-                        },
-                        child: Text('친구 수락'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () async {
+                              FriendService friendService = FriendService();
+                              await friendService.acceptFriendRequest(userID, currentUserId, userName, context);
+                            },
+                            child: Text('친구 수락'),
+                          ),
+                          SizedBox(width: 8), // 버튼 사이의 간격
+                          ElevatedButton(
+                            onPressed: () async {
+                              FriendService friendService = FriendService();
+                              await friendService.rejectFriendRequest(userID, currentUserId, context);
+                            },
+                            child: Text('친구 거절'),
+                          ),
+                        ],
                       ),
                       onTap: () {
                         // 해당 사용자의 프로필 페이지로 이동하거나 필요한 작업을 수행할 수 있습니다.
