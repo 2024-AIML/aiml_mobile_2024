@@ -36,7 +36,7 @@ class _LoginState extends State<Login>{
   Widget build(BuildContext context) {
     return CommonScaffold(
       title: Text('로그인'),
-      body: Padding(
+      pages: [Padding(
         padding: EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -97,6 +97,7 @@ class _LoginState extends State<Login>{
           ],
         ),
       ),
+    ],
     );
   }
 }

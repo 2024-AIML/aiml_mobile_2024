@@ -103,7 +103,8 @@ class _FriendLocationState extends State<FriendLocation> {
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
+    return Scaffold(
+      appBar: AppBar(
       title: Text('내 친구 찾기'),
       actions: [
         IconButton(
@@ -113,7 +114,8 @@ class _FriendLocationState extends State<FriendLocation> {
           },
         ),
       ],
-      body: Stack(
+      ),
+     body: Center(child: Stack(
         children: [
           // Map
           if (_currentPosition != null)
@@ -203,6 +205,6 @@ class _FriendLocationState extends State<FriendLocation> {
           ),
         ],
       ),
-    );
+    ));
   }
 }

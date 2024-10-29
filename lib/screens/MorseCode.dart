@@ -16,7 +16,7 @@ class MorseCodePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('모스부호 안내'),
+        title: Text('모스부호 변환'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

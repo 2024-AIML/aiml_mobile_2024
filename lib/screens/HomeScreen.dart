@@ -1,10 +1,16 @@
 import 'package:aiml_mobile_2024/screens/AddFriend.dart';
 import 'package:aiml_mobile_2024/screens/JoinMember.dart';
 import 'package:aiml_mobile_2024/screens/LogIn.dart';
+import 'package:aiml_mobile_2024/screens/SignIn.dart';
 import 'package:aiml_mobile_2024/screens/MorseCode.dart';
 import 'package:aiml_mobile_2024/screens/MyPage.dart';
 import 'package:aiml_mobile_2024/screens/FriendsNotification.dart';
 import 'package:aiml_mobile_2024/screens/Guidelines.dart';
+import 'package:aiml_mobile_2024/screens/Community.dart';
+import 'package:aiml_mobile_2024/screens/InfraLocation.dart';
+import 'package:aiml_mobile_2024/screens/ShelterLocation.dart';
+import 'package:aiml_mobile_2024/screens/FriendsLocation.dart';
+import 'package:aiml_mobile_2024/screens/ShowCustomSearchMessage.dart';
 import 'package:flutter/material.dart';
 import '../widget/CommonScaffold.dart'; // CommonScaffold.dart file import
 
@@ -13,7 +19,9 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return CommonScaffold(
       title:Text('') ,
-      body: Stack(
+      pages: [
+
+        Stack(
         children: [
           // Main content of the screen
           Center(
@@ -102,7 +110,7 @@ class HomeScreen extends StatelessWidget {
             top: 3.0, // Adjust the top position
             left: 16.0, // Adjust the left position
             child: IconButton(
-              icon: Icon(Icons.help_outline),
+              icon: Icon(Icons.menu_book),
               onPressed: () {
                 // Navigate to MorseCodePage when the SOS icon is tapped
                 _showMenu(context);
@@ -118,6 +126,11 @@ class HomeScreen extends StatelessWidget {
           )
         ],
       ),
+        InfraScreen(),               // Page 1 - 내 주변
+        ShelterLocationScreen(),     // Page 2 - 길 안내
+        FriendLocation(),            // Page 3 - 친구 찾기
+        ShowCustomSearchMessage(),   // Page 4 - 재난 문자 목록
+    ],
     );
   }
 }
@@ -160,7 +173,7 @@ void _showOptionsModal(BuildContext context) {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context)=>  NotificationsPage()),
+                  MaterialPageRoute(builder: (context)=>  NotificationsPage(senderUserId: '',)),
                 );
               }
             ),
@@ -172,7 +185,7 @@ void _showOptionsModal(BuildContext context) {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Login()),
+                  MaterialPageRoute(builder: (context) => SignIn()),
                 );
               },
             ),
@@ -229,7 +242,16 @@ void _showMenu(BuildContext context) {
       context,
       MaterialPageRoute(builder: (context) => GuidelinePage()),);
   }
-  )
+  ),
+            ListTile(
+                title: const Text('커뮤니티 게시판'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) =>Community()),);
+                }
+            )
           ],
       ),
     );

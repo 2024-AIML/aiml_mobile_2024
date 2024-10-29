@@ -8,6 +8,7 @@ import 'package:aiml_mobile_2024/screens/Navigation.dart';
 import 'package:aiml_mobile_2024/screens/Sample_showData.dart';
 import 'package:aiml_mobile_2024/screens/ShelterLocation.dart';
 import 'package:aiml_mobile_2024/service/LocationUpdate.dart';
+import 'package:aiml_mobile_2024/screens/PostDetailPage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
@@ -21,7 +22,12 @@ import '../screens/FriendsLocation.dart';
 import '../screens/BeforeMember.dart';
 import '../screens/ChangeInfo.dart';
 import 'package:aiml_mobile_2024/service/LocationUpdate.dart';
-
+import 'package:aiml_mobile_2024/screens/SignIn.dart';
+import 'package:aiml_mobile_2024/screens/HomeScreen.dart';
+import 'package:aiml_mobile_2024/screens/InfraLocation.dart';
+import 'package:aiml_mobile_2024/screens/ShelterLocation.dart';
+import 'package:aiml_mobile_2024/screens/FriendsLocation.dart';
+import 'package:aiml_mobile_2024/screens/ShowCustomSearchMessage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +45,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+
       initialRoute: '/',
       routes: {
         '/': (context) => HomeScreen(),
@@ -49,8 +56,9 @@ class MyApp extends StatelessWidget {
         '/message': (context) => ShowCustomSearchMessage(),
         '/MyPage' : (context) => MyPage(),
         '/Signup': (context) => JoinMember(),
-        '/login': (context)=>Login(),
+        '/login': (context)=>SignIn(),
         '/AddFriend':(context)=>AddFriend(),
+        '/HomeScreen':(context)=>HomeScreen(),
         //'/ChangeInfo':(context)=>ChangeInfo(documentId: documentId),
       },
     );

@@ -11,8 +11,11 @@ class BeforeMember extends StatefulWidget {
 class _BeforeMemberState extends State<BeforeMember> {
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      title: Text('Before Member'),
+    return Scaffold(
+      appBar: AppBar(  // Correctly initializing the AppBar
+        title: Text('Before Member'),
+        actions: [], // Add actions if needed
+      ),
       body: Align(
         alignment: Alignment(0.0, -0.6),
         child: Container(
@@ -85,4 +88,5 @@ class _BeforeMemberState extends State<BeforeMember> {
     );
   }
 }
+
 

@@ -123,9 +123,8 @@ class _InfraScreenState extends State<InfraScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      title: Text("병원 및 약국"),
-      body: Column(
+    return Center(
+     child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
@@ -239,7 +238,7 @@ class _InfraScreenState extends State<InfraScreen> {
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(_pharmacies[index].name),
-                    subtitle: Text(
+                    subtitle: Text (
                       '${_pharmacies[index].distance?.toStringAsFixed(2)} km',
                     ),
                   );
@@ -248,6 +247,7 @@ class _InfraScreenState extends State<InfraScreen> {
             ),
         ],
       ),
+
     );
   }
 }
