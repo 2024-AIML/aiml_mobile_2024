@@ -41,9 +41,8 @@ class _ShowCustomSearchMessageState extends State<ShowCustomSearchMessage> {
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      title: Text("재난 안전 문자 목록"),
-      body: Column(
+    return Center(
+      child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -99,6 +98,7 @@ class _ShowCustomSearchMessageState extends State<ShowCustomSearchMessage> {
           ),
         ],
       ),
+
     );
   }
 }

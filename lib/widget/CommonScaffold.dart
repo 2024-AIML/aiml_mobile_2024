@@ -1,54 +1,55 @@
 // CommonScaffold.dart
 
 import 'package:flutter/material.dart';
+import '../screens/HomeScreen.dart';
+import '../screens/InfraLocation.dart';
+import '../screens/ShelterLocation.dart';
+import '../screens/FriendsLocation.dart';
+import '../screens/ShowCustomSearchMessage.dart';
 
-class CommonScaffold extends StatelessWidget {
-  final Widget body;
+class CommonScaffold extends StatefulWidget {
   final Widget title;
   final List<Widget>? actions;
-
+  final List<Widget> pages;
 
   const CommonScaffold({
     Key? key,
     required this.title,
-    required this.body,
+    required this.pages,
     this.actions,
-  }) : super(key: key); // key를 명시하지 않습니다.
+  }) : super(key: key);
+
+  @override
+  _CommonScaffoldState createState() => _CommonScaffoldState();
+}
+
+class _CommonScaffoldState extends State<CommonScaffold> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: title,
-        actions: actions,
+        title: widget.title,
+        actions: widget.actions,
       ),
-      body: body,
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: widget.pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
         backgroundColor: Color(0xffD212121),
         selectedItemColor: Colors.green,
         unselectedItemColor: Colors.white,
-        onTap: (int index) {
-          switch (index) {
-            case 0:
-              Navigator.pushNamed(context, '/');
-              break;
-            case 1:
-              Navigator.pushNamed(context, '/infra_info');
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/navigator');
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/search_missing_person');
-              break;
-            case 4:
-              Navigator.pushNamed(context, '/message');
-              break;
-            default:
-              break;
-          }
-        },
+        onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
           BottomNavigationBarItem(icon: Icon(Icons.place), label: '내 주변'),

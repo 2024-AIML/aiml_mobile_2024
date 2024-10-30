@@ -1,22 +1,38 @@
-import 'package:wow/screens/HomeScreen.dart';
+import '../firebase_options.dart';
+import '../screens/AddFriend.dart';
+import '../screens/MorseCode.dart';
+import '../screens/MyPage.dart';
+import '../screens/FriendsList.dart';
+import '../screens/JoinMember.dart';
+import '../screens/Navigation.dart';
+import '../screens/Sample_showData.dart';
+import '../screens/ShelterLocation.dart';
+import '../service/LocationUpdate.dart';
+import '../screens/PostDetailPage.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:wow/screens/AddFriend.dart';
-import 'package:wow/screens/FriendsNotification.dart';
-import 'package:wow/screens/MyPage.dart';
-
-import 'firebase_options.dart';
-import 'screens/JoinMember.dart';
-import 'screens/ShowCustomSearchMessage.dart';
+// import 'package:flutter_naver_map/flutter_naver_map.dart';
+import '../screens/HomeScreen.dart';
+import '../screens/ShowCustomSearchMessage.dart';
+import 'screens/LogIn.dart'; // ShowCustomSearchMessages.dart 파일 import
+import 'screens/Address.dart';
+import 'screens/ShelterLocation.dart';
+import 'screens/InfraLocation.dart';
+import '../screens/FriendsLocation.dart';
+import '../screens/BeforeMember.dart';
+import '../screens/ChangeInfo.dart';
+import '../service/LocationUpdate.dart';
+import '../screens/SignIn.dart';
+import '../screens/HomeScreen.dart';
+import '../screens/InfraLocation.dart';
+import '../screens/ShelterLocation.dart';
+import '../screens/FriendsLocation.dart';
+import '../screens/ShowCustomSearchMessage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform, // FirebaseOptions 설정
-  );
-  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // await NaverMapSdk.instance.initialize(clientId: '1dtmwihlto',
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // await NaverMapSdk.instance.initialize(clientId: 'vbuyb9r3k9',
   //     onAuthFailed: (ex) {
   //       print("******네이버맵 인증 오류: $ex ******");
   //     });
@@ -29,6 +45,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+
       initialRoute: '/',
       routes: {
         '/': (context) => HomeScreen(),
@@ -39,8 +56,10 @@ class MyApp extends StatelessWidget {
         '/message': (context) => ShowCustomSearchMessage(),
         '/MyPage' : (context) => MyPage(),
         '/Signup': (context) => JoinMember(),
-        // '/login': (context)=>Login(),
+        '/login': (context)=>SignIn(),
         '/AddFriend':(context)=>AddFriend(),
+        '/HomeScreen':(context)=>HomeScreen(),
+        //'/ChangeInfo':(context)=>ChangeInfo(documentId: documentId),
       },
     );
   }

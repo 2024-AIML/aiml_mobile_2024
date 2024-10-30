@@ -1,9 +1,8 @@
+import '../screens/JoinMember.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../widget/CommonScaffold.dart';
-import 'JoinMember.dart';
 
 class Login extends StatefulWidget{
   @override
@@ -37,7 +36,7 @@ class _LoginState extends State<Login>{
   Widget build(BuildContext context) {
     return CommonScaffold(
       title: Text('로그인'),
-      body: Padding(
+      pages: [Padding(
         padding: EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -98,6 +97,7 @@ class _LoginState extends State<Login>{
           ],
         ),
       ),
+      ],
     );
   }
 }

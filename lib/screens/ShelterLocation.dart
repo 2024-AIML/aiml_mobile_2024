@@ -2,7 +2,7 @@
 // import 'dart:io';
 // import 'package:flutter/cupertino.dart';
 // import 'package:flutter/material.dart';
-// import 'package:http/http.dart'as http;
+// import 'package:http/http.dart' as http;
 // import 'package:flutter_naver_map/flutter_naver_map.dart';
 // import 'package:geolocator/geolocator.dart';
 // import 'dart:convert';
@@ -28,6 +28,7 @@
 //   Position? _currentPosition;
 //   NaverMapController? _controller;
 //   bool isLoading = true;
+//   String _sortOption = 'distance'; // Declare _sortOption here
 //
 //   @override
 //   void initState() {
@@ -44,7 +45,7 @@
 //     final headers = {
 //       'X-NCP-APIGW-API-KEY-ID': clientId,
 //       'X-NCP-APIGW-API-KEY': clientSecret,
-//     }; //HTTP 요청 헤더를 추가합니다.
+//     };
 //
 //     try {
 //       final response = await http.get(Uri.parse(apiUrl), headers: headers);
@@ -55,12 +56,10 @@
 //         setState(() {
 //           mapImage = image;
 //         });
-//       }
-//       else {
+//       } else {
 //         throw Exception('Failed to fetch map data');
 //       }
-//     }
-//     catch (e) {
+//     } catch (e) {
 //       print('Error fetching map data: $e');
 //     }
 //   }
@@ -91,10 +90,8 @@
 //   Future<void> _fetchShelters() async {
 //     if (_currentPosition != null) {
 //       try {
-//         // Load shelters from CSV file
 //         List<Shelter> shelters = await loadSheltersFromCsv();
 //
-//         // Calculate distances and filter out distant shelters
 //         final List<Shelter> nearbyShelters = [];
 //         for (var shelter in shelters) {
 //           double distanceInMeters = Geolocator.distanceBetween(
@@ -105,12 +102,11 @@
 //           );
 //           shelter.distance = distanceInMeters / 1000; // Convert to kilometers
 //
-//           if (shelter.distance <= 10) { // Filter out shelters beyond 10 km
+//           if (shelter.distance <= 10) {
 //             nearbyShelters.add(shelter);
 //           }
 //         }
 //
-//         // Sort shelters by distance
 //         nearbyShelters.sort((a, b) => a.distance.compareTo(b.distance));
 //
 //         setState(() {
@@ -158,16 +154,19 @@
 //       setState(() {
 //         markers = newMarkers;
 //       });
-//       for (var marker in markers){_controller!.addOverlay(marker);}
+//       for (var marker in markers) {
+//         _controller!.addOverlay(marker);
+//       }
 //     }
 //   }
+//
 //   Future<void> sendShelterClickedEvent(String InfraName) async {
 //     final String apiUrl = 'backend api 여기에 입력';
 //
 //     try {
 //       final response = await http.post(
 //         Uri.parse(apiUrl),
-//         body: {'shelter_id': InfraName}, // Sending shelter ID as data
+//         body: {'shelter_id': InfraName},
 //       );
 //
 //       if (response.statusCode == 200) {
@@ -182,9 +181,34 @@
 //
 //   @override
 //   Widget build(BuildContext context) {
-//     return CommonScaffold(
-//       title: Text("주변 대피소"),
-//       body: Column(
+//     // Sort shelters based on the selected option
+//     List<Shelter> sortedShelters = List.from(_shelters);
+//     if (_sortOption == 'distance') {
+//       sortedShelters.sort((a, b) => a.distance.compareTo(b.distance));
+//     } else {
+//       // 추천순
+//       sortedShelters.sort((a, b) {
+//         // Check if both shelters have capacity greater than 10,000
+//         bool aHasHighCapacity = a.Capacity > 10000;
+//         bool bHasHighCapacity = b.Capacity > 10000;
+//
+//         if (aHasHighCapacity && !bHasHighCapacity) {
+//           return -1;
+//         } else if (!aHasHighCapacity && bHasHighCapacity) {
+//           return 1;
+//         } else {
+//           return (a.distance ).compareTo(b.distance);
+//         }
+//       });
+//
+//       // If recommendation option is selected, take the top 5 shelters
+//       if (_sortOption == 'recommendation') {
+//         sortedShelters = sortedShelters.take(5).toList(); // Take top 5 shelters
+//       }
+//     }
+//
+//     return Center(
+//       child: Column(
 //         crossAxisAlignment: CrossAxisAlignment.start,
 //         children: [
 //           if (_currentPosition != null)
@@ -207,11 +231,41 @@
 //                 },
 //               ),
 //             ),
+//
+//           Padding(
+//             padding: const EdgeInsets.all(8.0),
+//             child: Row(
+//               mainAxisAlignment: MainAxisAlignment.start,
+//               children: [
+//                 Radio<String>(
+//                   value: 'distance',
+//                   groupValue: _sortOption,
+//                   onChanged: (value) {
+//                     setState(() {
+//                       _sortOption = value!;
+//                     });
+//                   },
+//                 ),
+//                 Text('거리순'),
+//                 Radio<String>(
+//                   value: 'recommendation',
+//                   groupValue: _sortOption,
+//                   onChanged: (value) {
+//                     setState(() {
+//                       _sortOption = value!;
+//                     });
+//                   },
+//                 ),
+//                 Text('추천순'),
+//               ],
+//             ),
+//           ),
+//
 //           Expanded(
 //             child: ListView.builder(
-//               itemCount: _shelters.length,
+//               itemCount: sortedShelters.length,
 //               itemBuilder: (context, index) {
-//                 final shelter = _shelters[index];
+//                 final shelter = sortedShelters[index];
 //
 //                 Color capacityColor;
 //                 if (shelter.Capacity == 0) {
@@ -249,11 +303,12 @@
 //                         Text(
 //                           '${shelter.distance.toStringAsFixed(2)} km',
 //                           overflow: TextOverflow.ellipsis,
+//                           style: TextStyle(fontWeight: FontWeight.bold),
 //                         ),
 //                         SizedBox(width: 20),
 //                         Text(
 //                           ' ${shelter.Capacity.toInt()}',
-//                           style: TextStyle(color: capacityColor),
+//                           style: TextStyle(color: capacityColor,fontWeight: FontWeight.bold),
 //                           overflow: TextOverflow.ellipsis,
 //                         ),
 //                       ],

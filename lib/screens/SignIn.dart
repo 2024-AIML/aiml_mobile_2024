@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../screens/MyPage.dart';
+import '../screens/JoinMember.dart';
 import '../service/token_storage.dart';
-import 'JoinMember.dart';
-import 'MyPage.dart';
-
 
 class SignIn extends StatefulWidget {
   @override
@@ -20,7 +19,7 @@ class _SignInState extends State<SignIn> {
     // String id = _idController.text; // 'id'로 변경
     // String password = _passwordController.text;
 
-    final url = Uri.parse('http://10.0.2.2:8081/api/login');
+    final url = Uri.parse('http://13.209.84.51:8081/api/login');
 
     final response = await http.post(
       url,
@@ -66,18 +65,27 @@ class _SignInState extends State<SignIn> {
             TextField(
               controller: _idController,  // 'id'를 입력받기 위한 컨트롤러
               decoration: InputDecoration(
-                labelText: "id",
-                // border: OutlineInputBorder(),
-                // hintText: "ID를 입력하세요",  // 프롬프트 수정
+                  labelText: "id",
+                  labelStyle: TextStyle(color: Colors.green[900]),
+                  border: OutlineInputBorder(),
+                  hintText: "ID를 입력하세요",
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color:Colors.green[900]!,)
+                  )
+                // 프롬프트 수정
               ),
             ),
             SizedBox(height: 10.0),
             TextField(
               controller: _passwordController,
               decoration: InputDecoration(
-                labelText: 'Password',
-                // border: OutlineInputBorder(),
-                // hintText: "비밀번호를 입력하세요",
+                  labelText: 'Password',
+                  labelStyle: TextStyle(color: Colors.green[900]),
+                  border: OutlineInputBorder(),
+                  hintText: "비밀번호를 입력하세요",
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color:Colors.green[900]!,)
+                  )
               ),
               obscureText: true,
             ),
@@ -86,17 +94,25 @@ class _SignInState extends State<SignIn> {
               onPressed: (){
                 _signIn(_idController.text, _passwordController.text);
               },
+              style: ElevatedButton.styleFrom(backgroundColor:Colors.black,foregroundColor: Colors.white),
               child: Text('Login'),
               // onPressed: _signIn,
               // child: Text('로그인'),
             ),
-            ElevatedButton(
+            TextButton(
                 onPressed: (){
                   Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => JoinMember())
                   );
-                }, child: Text('회원가입'))
+                },
+                child: Text(
+                    '회원가입',
+                    style : TextStyle(
+                      color:Colors.grey[700], fontSize:14,
+                      decoration: TextDecoration.underline,
+                    )
+                ))
           ],
         ),
       ),

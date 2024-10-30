@@ -1,123 +1,136 @@
+import '../screens/AddFriend.dart';
+import '../screens/JoinMember.dart';
+import '../screens/LogIn.dart';
+import '../screens/SignIn.dart';
+import '../screens/MorseCode.dart';
+import '../screens/MyPage.dart';
+import '../screens/FriendsNotification.dart';
+import '../screens/Guidelines.dart';
+import '../screens/Community.dart';
+import '../screens/InfraLocation.dart';
+import '../screens/ShelterLocation.dart';
+import '../screens/FriendsLocation.dart';
+import '../screens/ShowCustomSearchMessage.dart';
 import 'package:flutter/material.dart';
-import '../widget/CommonScaffold.dart';
-import 'AddFriend.dart';
-import 'FriendsNotification.dart';
-import 'Guidelines.dart';
-import 'JoinMember.dart';
-import 'LogIn.dart';
-import 'MorseCode.dart';
-import 'MyPage.dart'; // CommonScaffold.dart file import
+import '../widget/CommonScaffold.dart'; // CommonScaffold.dart file import
 
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
       title:Text('') ,
-      body: Stack(
-        children: [
-          // Main content of the screen
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              // Center the tiles vertically
-              children: [
-                const Spacer(flex: 3),
-                const SizedBox(height: 30),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(
-                        context, '/login'); // Replace with your login route
-                  },
-                  child: Container(
-                    width: 300,
-                    // Adjust width to your preference
-                    height: 60,
-                    // Adjust height to your preference
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Colors.green[900],
-                      // Background color
-                      borderRadius: BorderRadius.circular(20),
-                      // Rounded corners
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 4,
-                          offset: Offset(2, 2), // Shadow position
-                        ),
-                      ],
-                    ),
-                    child: const Text(
-                      '로그인',
-                      style: TextStyle(
-                        fontSize: 20, // Adjust text size
-                        color: Colors.white, // Text color
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20), // Space between the tiles
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(
-                        context, '/Signup'); // Replace with your sign-up route
-                  },
-                  child: Container(
-                    width: 300,
-                    // Adjust width to your preference
-                    height: 60,
-                    // Adjust height to your preference
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Colors.green[900],
-                      // Background color
-                      borderRadius: BorderRadius.circular(20),
-                      // Rounded corners
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 4,
-                          offset: Offset(2, 2), // Shadow position
-                        ),
-                      ],
-                    ),
-                    child: const Text(
-                      '회원가입',
-                      style: TextStyle(
-                        fontSize: 20, // Adjust text size
-                        color: Colors.white, // Text color
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const Spacer(flex: 1),
-              ],
-            ),
-          ),
+      pages: [
 
-          // SOS icon positioned at the top-left
-          Positioned(
-            top: 3.0, // Adjust the top position
-            left: 16.0, // Adjust the left position
-            child: IconButton(
-              icon: Icon(Icons.help_outline),
-              onPressed: () {
-                // Navigate to MorseCodePage when the SOS icon is tapped
-                _showMenu(context);
-              },
+        Stack(
+          children: [
+            // Main content of the screen
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                // Center the tiles vertically
+                children: [
+                  const Spacer(flex: 3),
+                  const SizedBox(height: 30),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                          context, '/login'); // Replace with your login route
+                    },
+                    child: Container(
+                      width: 300,
+                      // Adjust width to your preference
+                      height: 60,
+                      // Adjust height to your preference
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.green[900],
+                        // Background color
+                        borderRadius: BorderRadius.circular(20),
+                        // Rounded corners
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            offset: Offset(2, 2), // Shadow position
+                          ),
+                        ],
+                      ),
+                      child: const Text(
+                        '로그인',
+                        style: TextStyle(
+                          fontSize: 20, // Adjust text size
+                          color: Colors.white, // Text color
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20), // Space between the tiles
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                          context, '/Signup'); // Replace with your sign-up route
+                    },
+                    child: Container(
+                      width: 300,
+                      // Adjust width to your preference
+                      height: 60,
+                      // Adjust height to your preference
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.green[900],
+                        // Background color
+                        borderRadius: BorderRadius.circular(20),
+                        // Rounded corners
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            offset: Offset(2, 2), // Shadow position
+                          ),
+                        ],
+                      ),
+                      child: const Text(
+                        '회원가입',
+                        style: TextStyle(
+                          fontSize: 20, // Adjust text size
+                          color: Colors.white, // Text color
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const Spacer(flex: 1),
+                ],
+              ),
             ),
-          ),
-          Positioned(
-            top:3.0,
-            right: 16.0,
-            child: IconButton(
-                onPressed: (){_showOptionsModal(context);
-                }, icon: Icon(Icons.person)),
-          )
-        ],
-      ),
+
+            // SOS icon positioned at the top-left
+            Positioned(
+              top: 3.0, // Adjust the top position
+              left: 16.0, // Adjust the left position
+              child: IconButton(
+                icon: Icon(Icons.menu_book),
+                onPressed: () {
+                  // Navigate to MorseCodePage when the SOS icon is tapped
+                  _showMenu(context);
+                },
+              ),
+            ),
+            Positioned(
+              top:3.0,
+              right: 16.0,
+              child: IconButton(
+                  onPressed: (){_showOptionsModal(context);
+                  }, icon: Icon(Icons.person)),
+            )
+          ],
+        ),
+        // InfraScreen(),               // Page 1 - 내 주변
+        // ShelterLocationScreen(),     // Page 2 - 길 안내
+        // FriendLocation(),            // Page 3 - 친구 찾기
+        ShowCustomSearchMessage(),   // Page 4 - 재난 문자 목록
+      ],
     );
   }
 }
@@ -172,7 +185,7 @@ void _showOptionsModal(BuildContext context) {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Login()),
+                  MaterialPageRoute(builder: (context) => SignIn()),
                 );
               },
             ),
@@ -229,7 +242,16 @@ void _showMenu(BuildContext context) {
                     context,
                     MaterialPageRoute(builder: (context) => GuidelinePage()),);
                 }
-            )
+            ),
+            // ListTile(
+            //     title: const Text('커뮤니티 게시판'),
+            //     onTap: () {
+            //       Navigator.pop(context);
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(builder: (context) =>Community()),);
+            //     }
+            // )
           ],
         ),
       );

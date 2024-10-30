@@ -186,10 +186,10 @@ class AddFriend extends StatelessWidget {
                 backgroundColor: Colors.green[900],
               ),
               child: Text(
-                  '검색',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),),
+                '검색',
+                style: TextStyle(
+                  color: Colors.white,
+                ),),
             ),
           ],
         ),

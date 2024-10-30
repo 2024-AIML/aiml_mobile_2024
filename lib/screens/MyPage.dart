@@ -1,40 +1,82 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'dart:io';
-import 'dart:convert'; // For JSON decoding
-import 'package:http/http.dart' as http; // For making HTTP requests
+import 'dart:convert';
+import '../service/token_storage.dart';
 import '../widget/CommonScaffold.dart';
+import '../screens/HomeScreen.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
-import 'HomeScreen.dart';
-
-
-class MyPage extends StatefulWidget {
+class MyPage extends StatefulWidget{
+  //const Member({Key? key}) : super(key: key);
   @override
   _MyPageState createState() => _MyPageState();
 }
 
 class _MyPageState extends State<MyPage> {
-  String name = '홍길동 님'; // Default values
-  String phoneNum = '010-1234-5678';
+  String userName = '';
+  String userPhone = '';
 
   @override
   void initState() {
     super.initState();
-    fetchUserInfo();
+    fetchUserInfo(); // 페이지 로드 시 사용자 정보 가져오기
   }
 
   Future<void> fetchUserInfo() async {
-    final response = await http.get(Uri.parse('http://localhost:8081/UserInfo/get?name=Kim'));
+    String? jwtToken = await getJwtToken();
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      setState(() {
-        name = data['name']; // Fetch and update the name
-        phoneNum = data['phoneNum']; // Fetch and update the phone number
-      });
+    if (jwtToken != null) {
+      final response = await http.get(
+        Uri.parse('http://13.209.84.51:8081/api/member/info'),
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var userData = jsonDecode(response.body);
+        setState(() {
+          userName = userData['name'] ?? 'Unknown'; // name이 null이면 'Unknown'
+          userPhone = userData['phoneNum'] ?? 'No phone';
+        });
+      } else {
+        print("Failed to load user info: ${response.statusCode}, ${response
+            .body}");
+      }
     } else {
-      // Handle error
-      print('Failed to load user info');
+      print("JWT Token is missing");
+    }
+  }
+
+  Future<void> logout() async {
+    // JWT 토큰 가져오기
+    String? jwtToken = await getJwtToken();
+
+    if (jwtToken != null) {
+      final response = await http.post(
+        Uri.parse('http://localhost:8081/logout'),
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // 로그아웃 성공 시 JWT 토큰 삭제
+        await removeJwtToken();
+
+        // 로그아웃 시 로그인 페이지로 이동
+        Navigator.pushReplacementNamed(context, '/HomeScreen');
+      } else if (response.statusCode == 302) { // 302 에러
+        var redirectUrl = response.headers['location'];
+        if (redirectUrl != null) {
+          print("Redirecting to: $redirectUrl");
+          Navigator.pushReplacementNamed(context, '/HomeScreen');
+        }
+      } else {
+        print("Failed to logout: ${response.statusCode}, ${response.body}");
+      }
+    } else {
+      print("JWT Token is missing");
     }
   }
 
@@ -42,7 +84,7 @@ class _MyPageState extends State<MyPage> {
   Widget build(BuildContext context) {
     return CommonScaffold(
       title: Text('MyPage'),
-      body: Align(
+      pages: [Align(
         alignment: Alignment(0.0, -0.6),
         child: Container(
           width: 385, // Box width
@@ -78,19 +120,38 @@ class _MyPageState extends State<MyPage> {
                       SizedBox(width: 20), // Spacing between image and text
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            '$name', // Display fetched name
+                            '$userName', // Display fetched name
                             style: TextStyle(
                               fontSize: 18.0,
                               color: Colors.black,
                             ),
                           ),
                           Text(
-                            '$phoneNum', // Display fetched phone number
+                            '$userPhone', // Display fetched phone number
                             style: TextStyle(
                               fontSize: 14.0,
                               color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: 5.0), // Spacing between elements
+                          Text(
+                            userName.isNotEmpty ? userName : '이름을 불러오는 중...',
+                            style: TextStyle(
+                              fontSize: 16.0,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                          SizedBox(height: 5.0), // Spacing between elements
+                          Text(
+                            userPhone.isNotEmpty
+                                ? userPhone
+                                : '전화번호를 불러오는 중...',
+                            style: TextStyle(
+                              fontSize: 11.0,
+                              color: Colors.grey,
                             ),
                           ),
                         ],
@@ -103,13 +164,12 @@ class _MyPageState extends State<MyPage> {
                   children: <Widget>[
                     ElevatedButton(
                       onPressed: () {
-                        //정보수정페이지
-                        //Navigator.push(
+                        // Navigator.push(
                         //context,
-                        //MaterialPageRoute(builder: (context) => ChangeInfo(documentId:documentId),),
-                        //);
+                        // MaterialPageRoute(builder: (context) => ChangeInfo(documentId:documentId),),
+                        // );
                       },
-                      style: ElevatedButton.styleFrom(backgroundColor:Colors.black,foregroundColor: Colors.white),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.black,foregroundColor: Colors.white),
                       child: Text('회원정보 수정'),
                     ),
                     SizedBox(width: 20),
@@ -120,7 +180,7 @@ class _MyPageState extends State<MyPage> {
                           MaterialPageRoute(builder: (context) => HomeScreen()),
                         );
                       },
-                      style: ElevatedButton.styleFrom(backgroundColor:Colors.black,foregroundColor: Colors.white),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.black,foregroundColor: Colors.white),
                       child: Text('로그아웃'),
                     ),
                   ],
@@ -130,6 +190,7 @@ class _MyPageState extends State<MyPage> {
           ),
         ),
       ),
+      ],
     );
   }
 }

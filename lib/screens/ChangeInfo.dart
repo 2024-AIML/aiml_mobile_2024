@@ -106,8 +106,9 @@ class _ChangeInfoState extends State<ChangeInfo> {
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      title: Text('회원정보 수정'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('회원정보 수정'),),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(20.0),
