@@ -17,85 +17,93 @@ class ShowFirstThreeMessages extends StatefulWidget {
 
 class _ShowFirstThreeMessagesState extends State<ShowFirstThreeMessages> {
   List<Message> _latestMessages = [];
-  late ScrollController _scrollController;
-  Timer? _timer;
+  late PageController _pageController;
+  int _currentPage = 0;
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
+    _pageController = PageController();
     _fetchData();
-    _startAutoScroll();
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _scrollController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
   void _fetchData() async {
     List<Message> messages = await HttpService.fetchData();
     setState(() {
-      _latestMessages = messages.take(3).toList(); // Only show the first three messages
-    });
-  }
-
-  void _startAutoScroll() {
-    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.offset + 100, // Adjust the scroll amount based on your message height
-          duration: Duration(seconds: 1),
-          curve: Curves.easeInOut,
-        );
-      }
+      _latestMessages = messages.take(3).toList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return _latestMessages.isNotEmpty
-        ? Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.0),
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
       decoration: BoxDecoration(
-        color: Colors.grey[200], // Light gray background
+        color: Colors.grey[200],
         borderRadius: BorderRadius.circular(10.0),
       ),
-      height: 100, // Adjust height as needed
-      child: NotificationListener<ScrollNotification>(
-        onNotification: (ScrollNotification scrollInfo) {
-          if (scrollInfo.metrics.atEdge && scrollInfo.metrics.pixels != 0) {
-            _scrollController.jumpTo(0); // Reset scroll position to the top when reaching the end
-          }
-          return true;
-        },
-        child: ListView.builder(
-          controller: _scrollController,
-          itemCount: _latestMessages.length * 2, // Create a loop effect
-          itemBuilder: (context, index) {
-            return Align(
-              alignment: Alignment.centerLeft, // Left-aligned text
-              child: Container(
-                margin: EdgeInsets.only(bottom: 8.0), // Space between messages
-                child: Text(
-                  _latestMessages[index % _latestMessages.length].msg,
-                  style: TextStyle(fontSize: 16.0),
-                  textAlign: TextAlign.left,
+      height: 130, // 메시지 박스 높이 조정
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // 메시지 출력 부분
+          Expanded(
+            child: _latestMessages.isNotEmpty
+                ? PageView.builder(
+                  controller: _pageController,
+                 itemCount: _latestMessages.length,
+                 onPageChanged: (int index) {
+                    setState(() {
+                      _currentPage = index;
+                   });
+                 },
+                  itemBuilder: (context, index) {
+                   return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0), // 메시지 내부 여백
+                     child: Center(
+                       child: Text(
+                          _latestMessages[index].msg,
+                         style: TextStyle(fontSize: 15.0),
+                         textAlign: TextAlign.left,
+                       ),
+                     ),
+                   );
+                 },
+               )
+                : Center(child: CircularProgressIndicator()),
+             ),
+          SizedBox(height: 8.0),
+
+          // 도트 인디케이터
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(_latestMessages.length, (index) {
+              return Container(
+                margin: EdgeInsets.symmetric(horizontal: 4.0),
+                width: 8.0,
+                height: 8.0,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _currentPage == index
+                      ? Colors.grey[500] // 현재 페이지에 해당하는 도트 색
+                      : Colors.grey[300], // 나머지 도트 색
                 ),
-              ),
-            );
-          },
-          scrollDirection: Axis.vertical,
-        ),
+              );
+            }),
+          ),
+        ],
       ),
-    )
-        : Center(
-      child: CircularProgressIndicator(),
     );
   }
 }
+
+
 
 class HomeScreenAfterLogin extends StatelessWidget {
   final String userName; // Add userName variable
@@ -105,7 +113,7 @@ class HomeScreenAfterLogin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      title: Text('홈 화면'),
+      title: Text(''),
       actions: [
         IconButton(
           icon: Icon(Icons.help_outline, color: Colors.black),
@@ -127,75 +135,239 @@ class HomeScreenAfterLogin extends StatelessWidget {
     );
   }
 
+
+
   Widget _buildHomeContent() {
     return SingleChildScrollView(
       child: Column(
         children: [
           SizedBox(height: 10),
-          Row(
+
+
+
+
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.0), // Adjusts box padding from the sides
+            child: Container(
+              padding: EdgeInsets.all(20.0), // Padding inside the box
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(10.0),
+                //border: Border.all(color: Colors.grey),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Greeting text
+                  Row(
+                    children: [
+                      Text(
+                        '안녕하세요,',
+                        style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.normal),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        '$userName 님!',
+                        style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 60),
+
+
+
+                  Row(
+                    children: [
+                      Text(
+                        '최근 안내 문자',
+                        style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20.0),
+
+                  Padding(
+                    padding: EdgeInsets.zero,
+                    child: ShowFirstThreeMessages(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          SizedBox(height: 30.0,),
+
+
+
+
+
+
+
+
+          // -------------------- 약국이랑 병원 등등 지도 표시하기 ---------------
+
+          const Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(
-                padding: EdgeInsets.only(left: 10.0, top: 5.0),
-                child: Text(
-                  '안녕하세요 $userName 님!',
-                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                padding: EdgeInsets.only(left: 40.0),
+                child: Text.rich(
+                  TextSpan(
+                    text: '지금 ',
+                    style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+                    children: [
+                      TextSpan(
+                        text: '내 주변은',
+                        style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold,),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 15),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(left: 10.0),
-                child: Text(
-                  '최근 문자',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.normal),
-                ),
-              ),
-            ],
+          SizedBox(height: 25.0),
+          // --------------- 여기에 지도 넣어야해요 ----------------
+          // ---------- 그래서 일단 박스를 넣어놓음 ! ------------
+          // -------------- 여기부터 박스입니다 ---------------
+          Container(
+            height: 300,
+            margin: EdgeInsets.symmetric(horizontal: 20.0),
+            decoration: BoxDecoration(
+              color: Colors.grey[500],
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: const Center(
+              child : Text(
+                '여기에다가 지도 넣으면 됨 ! ',
+                style: TextStyle(color: Colors.white, fontSize: 16.0),
+              )
+            ),
           ),
-          SizedBox(height: 10.0),
-          ShowFirstThreeMessages(),
+          SizedBox(height: 10.0,),
+          Container(
+            height: 40.0,
+            margin: EdgeInsets.symmetric(horizontal: 20.0),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: const Center(
+              child: Text(
+                '약국 1 ',
+                style: TextStyle(color: Colors.black, fontSize: 16.0),
+              ),
+            ),
+          ),
+          SizedBox(height: 8.0,),
+          Container(
+            height: 40.0,
+            margin: EdgeInsets.symmetric(horizontal: 20.0),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: const Center(
+              child: Text(
+                '약국 2 ',
+                style: TextStyle(color: Colors.black, fontSize: 16.0),
+              ),
+            ),
+          ),
+          SizedBox(height: 8.0,),
+          Container(
+            height: 40.0,
+            margin: EdgeInsets.symmetric(horizontal: 20.0),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: const Center(
+              child: Text(
+                '약국 3 ',
+                style: TextStyle(color: Colors.black, fontSize: 16.0),
+              ),
+            ),
+          ),
+// ---------------------------------- 여기까지 박스입니다 ------
           SizedBox(height: 30.0),
+
+
+
+
+
+
+
+
+
+          // ---------------게시판 ------------------------------------
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(
-                padding: EdgeInsets.only(left: 10.0),
+                padding: EdgeInsets.only(left: 40.0),
                 child: Text(
-                  '지금 내 주변은',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.normal),
+                  '우리 동네 게시판',
+                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 10.0),
-          // --------------- 여기에 지도 넣어야해요 아마도 ??????? ----------------
+          SizedBox(height: 25.0),
 
 
 
 
-
-
-
-          SizedBox(height: 30.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(left: 10.0),
-                child: Text(
-                  '게시판',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.normal),
-                ),
+          // ------- 게시판 글 불러오는 자리
+          // ---------- 여기부터는 임시로 넣어놓은 박스임
+          Container(
+            height: 80.0,
+            margin: EdgeInsets.symmetric(horizontal: 20.0),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: const Center(
+              child: Text(
+                '게시물 게시물 게시물',
+                style: TextStyle(color: Colors.black, fontSize: 16.0),
               ),
-            ],
+            ),
           ),
-          SizedBox(height: 10.0),
-          /// ------- 게시판 글 불러오는 자리
+          SizedBox(height: 8.0,),
+          Container(
+            height: 80.0,
+            margin: EdgeInsets.symmetric(horizontal: 20.0),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: const Center(
+              child: Text(
+                '게시물 게시물 게시물',
+                style: TextStyle(color: Colors.black, fontSize: 16.0),
+              ),
+            ),
+          ),
+          SizedBox(height: 8.0,),
+          Container(
+            height: 80.0,
+            margin: EdgeInsets.symmetric(horizontal: 20.0),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: const Center(
+              child: Text(
+                '게시물 게시물 게시물',
+                style: TextStyle(color: Colors.black, fontSize: 16.0),
+              ),
+            ),
+          ),
+          SizedBox(height: 30.0,),
         ],
       ),
     );

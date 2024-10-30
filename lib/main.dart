@@ -1,3 +1,5 @@
+import 'package:wow/screens/HomeScreenAfterLogin.dart';
+
 import '../firebase_options.dart';
 import '../screens/AddFriend.dart';
 import '../screens/MorseCode.dart';
@@ -38,7 +40,7 @@ void main() async {
   //     });
   runApp(MyApp());
 }
-
+git
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super (key : key);
 
@@ -48,7 +50,7 @@ class MyApp extends StatelessWidget {
 
       initialRoute: '/',
       routes: {
-        '/': (context) => HomeScreen(),
+        '/': (context) => HomeScreenAfterLogin(userName: 'main.dart 에서 바꿀 수 있음',),
         // 임시로 회원가입으로 해놓은 화면
         // '/infra_info': (context) => InfraScreen(),
         // '/navigator': (context) => ShelterLocationScreen(),
@@ -59,6 +61,7 @@ class MyApp extends StatelessWidget {
         '/login': (context)=>SignIn(),
         '/AddFriend':(context)=>AddFriend(),
         '/HomeScreen':(context)=>HomeScreen(),
+        '/HomeAfterLogin' : (context) => HomeScreenAfterLogin(userName: '나중에 바꿔야함'),
         //'/ChangeInfo':(context)=>ChangeInfo(documentId: documentId),
       },
     );
