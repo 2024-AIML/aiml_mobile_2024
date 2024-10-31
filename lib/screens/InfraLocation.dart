@@ -1,9 +1,13 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:convert';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:geolocator/geolocator.dart';
 import '../service/InfraInfoService.dart';
-import '../widget/CommonScaffold.dart';
+
 
 class InfraScreen extends StatefulWidget {
   @override
@@ -17,15 +21,39 @@ class _InfraScreenState extends State<InfraScreen> {
   List<NMarker> markers = [];
   Position? _currentPosition;
   NaverMapController? _controller;
-  String? selectedLocation = '병원';
+  String? selectedLocation;
   bool showList = false; // 리스트가 보일지 여부를 제어하는 변수
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
-    _fetchHospitals();
-    _fetchPharmacies();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      LocationPermission permission = await Geolocator.requestPermission();
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      setState(() {
+        _currentPosition = position;
+      });
+      if (_controller != null) {
+        _controller!.updateCamera(
+          NCameraUpdate.scrollAndZoomTo(
+            target: NLatLng(
+              _currentPosition!.latitude,
+              _currentPosition!.longitude,
+            ),
+          ),
+        );
+      }
+      _fetchHospitals();
+      _fetchPharmacies();
+    } catch (e) {
+      print("Error: $e");
+    }
   }
 
   Future<void> _fetchHospitals() async {
@@ -95,67 +123,52 @@ class _InfraScreenState extends State<InfraScreen> {
     });
   }
 
-  Future<void> _getCurrentLocation() async {
-    try {
-      LocationPermission permission = await Geolocator.requestPermission();
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      setState(() {
-        _currentPosition = position;
-      });
-      if (_controller != null) {
-        _controller!.updateCamera(
-          NCameraUpdate.scrollAndZoomTo(
-            target: NLatLng(
-              _currentPosition!.latitude,
-              _currentPosition!.longitude,
-            ),
-          ),
-        );
-      }
-      _fetchHospitals();
-      _fetchPharmacies();
-    } catch (e) {
-      print("Error: $e");
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Center(
-     child: Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: Stack(
               children: [
-                AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
-                  height: showList ? MediaQuery.of(context).size.height * 0.4 : MediaQuery.of(context).size.height * 0.7, // 지도 크기 조정
-                  child: NaverMap(
-                    options: NaverMapViewOptions(
-                      initialCameraPosition: NCameraPosition(
-                        target: NLatLng(
-                          _currentPosition?.latitude ?? 37.5665,
-                          _currentPosition?.longitude ?? 126.9780,
-                        ),
-                        zoom: 14,
+                // NaverMap wrapped in Expanded to ensure it occupies available space
+                NaverMap(
+                  options: NaverMapViewOptions(
+                    initialCameraPosition: NCameraPosition(
+                      target: NLatLng(
+                        _currentPosition?.latitude ?? 37.5665,
+                        _currentPosition?.longitude ?? 126.9780,
                       ),
+                      zoom: 14,
                     ),
-                    onMapReady: (controller) {
-                      setState(() {
-                        _controller = controller;
-                      });
-                    },
-                    onMapTapped: (point, latLng) {
-                      // 지도를 클릭하면 리스트를 닫고 지도를 확장
-                      setState(() {
-                        showList = false;
-                      });
-                    },
                   ),
+                  onMapReady: (controller) {
+                    setState(() {
+                      _controller = controller;
+                    });
+
+                    // Move camera to the current position if available
+                    if (_currentPosition != null) {
+                      _controller!.updateCamera(
+                        NCameraUpdate.scrollAndZoomTo(
+                          target: NLatLng(
+                            _currentPosition!.latitude,
+                            _currentPosition!.longitude,
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  onMapTapped: (point, latLng) {
+                    // Close the list when the map is tapped
+                    setState(() {
+                      showList = false;
+                    });
+                  },
                 ),
+                // Positioned buttons for selecting location type
                 Positioned(
                   top: 20,
                   left: 20,
@@ -163,8 +176,8 @@ class _InfraScreenState extends State<InfraScreen> {
                     onPressed: () {
                       setState(() {
                         selectedLocation = '병원';
-                        showList = true; // 리스트를 보여줌
-                        _updateMarkers();
+                        showList = true; // Show the list
+                        _updateMarkers(); // Update markers for hospitals
                       });
                     },
                     child: Row(
@@ -193,8 +206,8 @@ class _InfraScreenState extends State<InfraScreen> {
                     onPressed: () {
                       setState(() {
                         selectedLocation = '약국';
-                        showList = true; // 리스트를 보여줌
-                        _updateMarkers();
+                        showList = true; // Show the list
+                        _updateMarkers(); // Update markers for pharmacies
                       });
                     },
                     child: Row(
@@ -219,8 +232,13 @@ class _InfraScreenState extends State<InfraScreen> {
               ],
             ),
           ),
+          // ListView for displaying the selected location's information
           if (showList)
-            Expanded(
+            Container(
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.3,
               child: selectedLocation == '병원'
                   ? ListView.builder(
                 itemCount: _hospitals.length,
@@ -238,7 +256,7 @@ class _InfraScreenState extends State<InfraScreen> {
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(_pharmacies[index].name),
-                    subtitle: Text (
+                    subtitle: Text(
                       '${_pharmacies[index].distance?.toStringAsFixed(2)} km',
                     ),
                   );
@@ -247,7 +265,6 @@ class _InfraScreenState extends State<InfraScreen> {
             ),
         ],
       ),
-
     );
   }
 }

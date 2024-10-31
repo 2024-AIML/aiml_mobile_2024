@@ -1,5 +1,6 @@
 import 'package:aiml_mobile_2024/firebase_options.dart';
 import 'package:aiml_mobile_2024/screens/AddFriend.dart';
+import 'package:aiml_mobile_2024/screens/HomeScreenAfterLogin.dart';
 import 'package:aiml_mobile_2024/screens/MorseCode.dart';
 import 'package:aiml_mobile_2024/screens/MyPage.dart';
 import 'package:aiml_mobile_2024/screens/FriendsList.dart';
@@ -48,7 +49,7 @@ class MyApp extends StatelessWidget {
 
       initialRoute: '/',
       routes: {
-        '/': (context) => HomeScreen(),
+        '/': (context) => HomeScreenAfterLogin(),
         // 임시로 회원가입으로 해놓은 화면
         '/infra_info': (context) => InfraScreen(),
         '/navigator': (context) => ShelterLocationScreen(),

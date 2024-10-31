@@ -1,4 +1,5 @@
 import 'package:aiml_mobile_2024/screens/AddFriend.dart';
+import 'package:aiml_mobile_2024/screens/HomeScreenAfterLogin.dart';
 import 'package:aiml_mobile_2024/screens/JoinMember.dart';
 import 'package:aiml_mobile_2024/screens/LogIn.dart';
 import 'package:aiml_mobile_2024/screens/SignIn.dart';
@@ -105,18 +106,6 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
 
-          // SOS icon positioned at the top-left
-          Positioned(
-            top: 3.0, // Adjust the top position
-            left: 16.0, // Adjust the left position
-            child: IconButton(
-              icon: Icon(Icons.menu_book),
-              onPressed: () {
-                // Navigate to MorseCodePage when the SOS icon is tapped
-                _showMenu(context);
-              },
-            ),
-          ),
           Positioned(
             top:3.0,
             right: 16.0,
@@ -126,7 +115,7 @@ class HomeScreen extends StatelessWidget {
           )
         ],
       ),
-        InfraScreen(),               // Page 1 - 내 주변
+        Community(),               // Page 1 - 내 주변
         ShelterLocationScreen(),     // Page 2 - 길 안내
         FriendLocation(),            // Page 3 - 친구 찾기
         ShowCustomSearchMessage(),   // Page 4 - 재난 문자 목록
@@ -215,46 +204,3 @@ void _showOptionsModal(BuildContext context) {
   );
 }
 
-void _showMenu(BuildContext context) {
-  showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-      ListTile(
-      title: const Text('모스부호 변환기'),
-      onTap: () {
-        Navigator.pop(context); // Close the modal
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MorseCodePage()),
-        );
-      },
-    ),
-  ListTile(
-  title: const Text('행동 지침 안내'),
-  onTap: () {
-    Navigator.pop(context);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => GuidelinePage()),);
-  }
-  ),
-            ListTile(
-                title: const Text('커뮤니티 게시판'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) =>Community()),);
-                }
-            )
-          ],
-      ),
-    );
-      },
-  );
-}

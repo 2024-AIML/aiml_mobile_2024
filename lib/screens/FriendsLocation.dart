@@ -103,20 +103,9 @@ class _FriendLocationState extends State<FriendLocation> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-      title: Text('내 친구 찾기'),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.person_add),
-          onPressed: () {
-            _showAddFriendDialog(context);
-          },
-        ),
-      ],
-      ),
-     body: Center(child: Stack(
+    return Center(child: Stack(
         children: [
+
           // Map
           if (_currentPosition != null)
             NaverMap(
@@ -203,8 +192,12 @@ class _FriendLocationState extends State<FriendLocation> {
               },
             ),
           ),
+          Positioned(
+            top:3.0,
+            right: 16.0,child: IconButton(onPressed:() {_showAddFriendDialog(context);}, icon: Icon(Icons.person_add)),)
         ],
       ),
-    ));
+    );
+
   }
 }

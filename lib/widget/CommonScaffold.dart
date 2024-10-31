@@ -52,7 +52,7 @@ class _CommonScaffoldState extends State<CommonScaffold> {
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
-          BottomNavigationBarItem(icon: Icon(Icons.place), label: '내 주변'),
+          BottomNavigationBarItem(icon: Icon(Icons.content_paste_search), label: '게시판'),
           BottomNavigationBarItem(icon: Icon(Icons.near_me), label: '길 안내'),
           BottomNavigationBarItem(icon: Icon(Icons.youtube_searched_for), label: '친구 찾기'),
           BottomNavigationBarItem(icon: Icon(Icons.mode_comment), label: '재난 문자 목록'),
