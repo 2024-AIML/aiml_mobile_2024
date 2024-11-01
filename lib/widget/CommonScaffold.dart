@@ -19,7 +19,6 @@ class CommonScaffold extends StatefulWidget {
     required this.pages,
     this.actions,
     this.leading,
-
   }) : super(key: key);
 
   @override

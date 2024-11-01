@@ -112,7 +112,13 @@ class HomeScreen extends StatelessWidget {
             child: IconButton(
                 onPressed: (){_showOptionsModal(context);
             }, icon: Icon(Icons.person)),
-          )
+          ),
+
+          Positioned(
+              top: 3.0, right: 56.0,
+              child: IconButton(onPressed: () {
+                _showMenu(context);
+              }, icon:Icon(Icons.help_outline, color: Colors.black),))
         ],
       ),
         Community(),               // Page 1 - 내 주변
@@ -197,6 +203,42 @@ void _showOptionsModal(BuildContext context) {
                 Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()),);
             }
             )
+          ],
+        ),
+      );
+    },
+  );
+}
+
+void _showMenu(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return Container(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              title: const Text('모스부호 변환기'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MorseCodePage()),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('행동 지침 안내'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => GuidelinePage()),
+                );
+              },
+            ),
           ],
         ),
       );

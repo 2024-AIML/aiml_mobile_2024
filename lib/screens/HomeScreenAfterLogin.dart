@@ -3,6 +3,9 @@ import 'package:aiml_mobile_2024/screens/Community.dart';
 import 'package:aiml_mobile_2024/screens/FriendsLocation.dart';
 import 'package:aiml_mobile_2024/screens/ShelterLocation.dart';
 import 'package:aiml_mobile_2024/screens/ShowCustomSearchMessage.dart';
+import 'SignIn.dart';
+import 'JoinMember.dart';
+import 'HomeScreen.dart';
 import 'package:flutter/material.dart';
 import '../widget/CommonScaffold.dart'; // Import for CommonScaffold
 import '../service/HttpServiceForAPI.dart'; // Import for API calls
@@ -116,28 +119,40 @@ class HomeScreenAfterLogin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      title: Text(''),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.help_outline, color: Colors.black),
-          onPressed: () {
-            _showMenu(context);
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.person, color: Colors.black),
-          onPressed: () {
-            _showOptionsModal(context);
-          },
-        ),
-      ],
+      title: Text(''), // You can set a title if needed
       pages: [
-        _buildHomeContent(),
+        Stack(
+          children: [
+            Center(child: _buildHomeContent()), // Correct usage without extra comma
+
+            Positioned(
+              top: 3.0,
+              right: 16.0,
+              child: IconButton(
+                onPressed: () {
+                  _showOptionsModal(context);
+                },
+                icon: Icon(Icons.person),
+              ),
+            ),
+
+            Positioned(
+              top: 3.0,
+              right: 56.0,
+              child: IconButton(
+                onPressed: () {
+                  _showMenu(context);
+                },
+                icon: Icon(Icons.help_outline, color: Colors.black),
+              ),
+            ),
+          ],
+        ),
         Community(),
         ShelterLocationScreen(),
         FriendLocation(),
         ShowCustomSearchMessage(),
-        // Add more pages here if needed, e.g., InfraLocation(), ShelterLocation(), etc.
+        // Add more pages here if needed
       ],
     );
   }
@@ -233,7 +248,7 @@ class HomeScreenAfterLogin extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 25.0),
+          SizedBox(height: 10.0),
           SizedBox(
             height: 400.0,
             child: Padding(
@@ -410,4 +425,122 @@ void _showMenu(BuildContext context) {
       );
     },
   );
+
+  void _showOptionsModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.person),
+                title: const Text('마이페이지'),
+                onTap: () {
+                  Navigator.pop(context); // Close the modal
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MyPage()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.person_search_outlined),
+                title: const Text('친구추가'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AddFriend()),
+                  );
+                },
+              ),
+              ListTile(
+                  leading: const Icon(Icons.group_add_outlined),
+                  title: const Text('친구요청'),
+                  onTap:(){
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context)=>  NotificationsPage(senderUserId: '',)),
+                    );
+                  }
+              ),
+
+              ListTile(
+                leading: const Icon(Icons.login),
+                title: const Text('로그인'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SignIn()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.app_registration),
+                title: const Text('회원가입'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context)=> JoinMember()),
+                  );
+                },
+              ),
+              ListTile(
+                  leading: const Icon(Icons.logout),
+                  title: const Text('로그아웃'),
+                  onTap:(){
+                    Navigator.pop(context);
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()),);
+                  }
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                title: const Text('모스부호 변환기'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MorseCodePage()),
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text('행동 지침 안내'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => GuidelinePage()),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
 }

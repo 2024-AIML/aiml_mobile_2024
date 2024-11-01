@@ -103,101 +103,120 @@ class _FriendLocationState extends State<FriendLocation> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Stack(
+    return Center(
+      child: Column(
         children: [
-
-          // Map
-          if (_currentPosition != null)
-            NaverMap(
-              options: NaverMapViewOptions(
-                initialCameraPosition: NCameraPosition(
-                  target: NLatLng(
-                    _currentPosition!.latitude,
-                    _currentPosition!.longitude,
-                  ),
-                  zoom: 14,
-                ),
-              ),
-              onMapReady: (controller) {
-                setState(() {
-                  _mapController = controller;
-                });
-              },
-            ),
-          // Loading Indicator
-          if (isLoading)
-            Center(child: CircularProgressIndicator()),
           // Search Bar
-          Positioned(
-            top: 50, // Adjust as needed
-            left: 0,
-            right: 0,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 60,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: searchController,
-                        decoration: InputDecoration(
-                          labelText: '검색',
-                          labelStyle: TextStyle(color: Colors.green[900]),
-                          hintText: '친구 이름을 입력하세요',
-                          prefixIcon: Icon(Icons.search),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                            borderSide: BorderSide(color: Colors.green[900]!),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                            borderSide: BorderSide(color: Colors.grey),
-                          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              height: 60,
+              child: Row(
+                children: [
+                  Positioned(
+                    top: 3.0,
+                    left: 16.0,
+                    child: IconButton(
+                      onPressed: () {
+                        _showAddFriendDialog(context);
+                      },
+                      icon: Icon(Icons.person_add),
+                    ),
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: searchController,
+                      decoration: InputDecoration(
+                        labelText: '검색',
+                        labelStyle: TextStyle(color: Colors.green[900]),
+                        hintText: '친구 이름을 입력하세요',
+                        prefixIcon: Icon(Icons.search),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          borderSide: BorderSide(color: Colors.green[900]!),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          borderSide: BorderSide(color: Colors.grey),
                         ),
                       ),
                     ),
-                    SizedBox(width: 10.0),
-                    ElevatedButton(
-                      onPressed: _search,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                      ),
-                      child: Icon(Icons.search),
+                  ),
+                  SizedBox(width: 10.0),
+                  ElevatedButton(
+                    onPressed: _search,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
                     ),
-                  ],
-                ),
+                    child: Icon(Icons.search),
+                  ),
+                ],
               ),
             ),
           ),
-          // List of Friends
-          Positioned(
-            top: 110, // Adjust according to your design
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: filteredFriends.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(filteredFriends[index]['name']),
-                  onTap: () {
-                    double latitude = filteredFriends[index]['latitude'];
-                    double longitude = filteredFriends[index]['longitude'];
-                    _moveToFriendLocation(latitude, longitude);
+          // Map and Friends List
+          Expanded(
+            child: Stack(
+              children: [
+                // Naver Map
+                if (_currentPosition != null)
+                  NaverMap(
+                    options: NaverMapViewOptions(
+                      initialCameraPosition: NCameraPosition(
+                        target: NLatLng(
+                          _currentPosition!.latitude,
+                          _currentPosition!.longitude,
+                        ),
+                        zoom: 14,
+                      ),
+                    ),
+                    onMapReady: (controller) {
+                      setState(() {
+                        _mapController = controller;
+                      });
+                    },
+                  ),
+                // Loading Indicator
+                if (isLoading)
+                  Center(child: CircularProgressIndicator()),
+
+                // Friends List in a DraggableScrollableSheet
+                DraggableScrollableSheet(
+                  initialChildSize: 0.4, // Adjust initial size as needed
+                  minChildSize: 0.3,
+                  maxChildSize: 0.7,
+                  builder: (context, scrollController) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.9),
+                        // Semi-transparent background
+                        borderRadius: BorderRadius.vertical(top: Radius
+                            .circular(16)),
+                      ),
+                      child: ListView.builder(
+                        controller: scrollController,
+                        padding: EdgeInsets.zero,
+                        itemCount: filteredFriends.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(filteredFriends[index]['name']),
+                            onTap: () {
+                              double latitude = filteredFriends[index]['latitude'];
+                              double longitude = filteredFriends[index]['longitude'];
+                              _moveToFriendLocation(latitude, longitude);
+                            },
+                          );
+                        },
+                      ),
+                    );
                   },
-                );
-              },
+                ),
+              ],
             ),
           ),
-          Positioned(
-            top:3.0,
-            right: 16.0,child: IconButton(onPressed:() {_showAddFriendDialog(context);}, icon: Icon(Icons.person_add)),)
         ],
       ),
     );
-
   }
 }

@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
 
       initialRoute: '/',
       routes: {
-        '/': (context) => HomeScreen(),
+        '/': (context) => HomeScreenAfterLogin(),
         // 임시로 회원가입으로 해놓은 화면
         '/infra_info': (context) => InfraScreen(),
         '/navigator': (context) => ShelterLocationScreen(),

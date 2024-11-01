@@ -63,8 +63,29 @@ class _InfraScreenState extends State<InfraScreen> {
           _currentPosition!.latitude,
           _currentPosition!.longitude,
         );
+
+        final List<Hospital> nearbyHospitals = [];
+        for (var hospital in _hospitals) {
+          double distanceInMeters = Geolocator.distanceBetween(
+            _currentPosition!.latitude,
+            _currentPosition!.longitude,
+            hospital.latitude,
+            hospital.longitude, // Replace with the actual field from your Hospital object
+          );
+          hospital.distance = distanceInMeters / 1000; // Convert to kilometers
+
+          // Filter hospitals within 10 kilometers
+          if (hospital.distance <= 10) {
+            nearbyHospitals.add(hospital);
+          }
+        }
+
+        // Sort hospitals by distance
+        nearbyHospitals.sort((a, b) => a.distance.compareTo(b.distance));
+
+
         setState(() {
-          _hospitals = data;
+          _hospitals = nearbyHospitals;
         });
         _updateMarkers();
       } catch (e) {
@@ -128,10 +149,10 @@ class _InfraScreenState extends State<InfraScreen> {
   @override
   Widget build(BuildContext context) {
     return Center(
-     child: Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-         Expanded(
+          Expanded(
             child: Stack(
               children: [
                 AnimatedContainer(
@@ -153,10 +174,10 @@ class _InfraScreenState extends State<InfraScreen> {
                       });
 
                       _controller!.updateCamera(
-                          NCameraUpdate.scrollAndZoomTo(
-                            target: NLatLng(_currentPosition!.latitude, _currentPosition!.longitude,
-                            ),
-                      ),
+                        NCameraUpdate.scrollAndZoomTo(
+                          target: NLatLng(_currentPosition!.latitude, _currentPosition!.longitude,
+                          ),
+                        ),
                       );
                     },
                     onMapTapped: (point, latLng) {
