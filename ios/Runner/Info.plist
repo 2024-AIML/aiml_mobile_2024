@@ -55,5 +55,9 @@
    <string>We need your location to find nearby hospitals</string>
    <key>NSLocationWhenInUseUsageDescription</key>
    <string>We need your location to find nearby pharmacies</string>
+   <key>LSApplicationQueriesSchemes</key>
+   <array>
+       <string>nmap</string>
+   </array>
 </dict>
 </plist>

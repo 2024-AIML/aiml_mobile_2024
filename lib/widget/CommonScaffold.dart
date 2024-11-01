@@ -11,12 +11,15 @@ class CommonScaffold extends StatefulWidget {
   final Widget title;
   final List<Widget>? actions;
   final List<Widget> pages;
+  final Widget? leading;
 
   const CommonScaffold({
     Key? key,
     required this.title,
     required this.pages,
     this.actions,
+    this.leading,
+
   }) : super(key: key);
 
   @override
@@ -36,6 +39,12 @@ class _CommonScaffoldState extends State<CommonScaffold> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: widget.leading??
+            (Navigator.canPop(context)
+                ? IconButton(
+                icon: Icon(Icons.arrow_back),
+      onPressed: (){Navigator.pop(context);},
+        ) :null),
         title: widget.title,
         actions: widget.actions,
       ),
