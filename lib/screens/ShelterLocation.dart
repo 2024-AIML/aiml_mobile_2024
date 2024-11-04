@@ -144,10 +144,18 @@ class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
   void _updateMarkers() {
     if (_controller != null) {
       List<NMarker> newMarkers = _shelters.map((shelter) {
-        return NMarker(
+        final NMarker marker = NMarker(
           id: shelter.InfraName,
           position: NLatLng(shelter.latitude_EPSG4326, shelter.longitude_EPSG4326),
         );
+        marker.setOnTapListener((NMarker tappedMarker) {
+          String shelterName = shelter.InfraName;
+          String url = 'nmap://route/walk?slat=${_currentPosition!.latitude}&slng=${_currentPosition!.longitude}&sname=%EC%84%9C%EC%9A%B8%EB%8C%80%ED%95%99%EA%B5%90&dlat=${shelter.latitude_EPSG4326}&dlng=${shelter.longitude_EPSG4326}&dname=$shelterName&appname=com.example.aiml_mobile_2024';
+          launch(url);
+        });
+
+        return marker;
+
       }).toList();
 
       setState(() {
@@ -158,6 +166,7 @@ class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
       }
     }
   }
+
 
 
   @override

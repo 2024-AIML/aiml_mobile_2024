@@ -92,7 +92,6 @@ class InfraInfoService {
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      print(utf8.decode(response.bodyBytes));
       var document = xml.XmlDocument.parse(utf8.decode(response.bodyBytes));
       var hospitals = document.findAllElements('item').map((element) {
         return Hospital.fromXml(element);
@@ -108,7 +107,6 @@ class InfraInfoService {
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      print(utf8.decode(response.bodyBytes));
       var document = xml.XmlDocument.parse(utf8.decode(response.bodyBytes));
       var pharmacies = document.findAllElements('item').map((element) {
         return Pharmacy.fromXml(element);

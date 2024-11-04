@@ -1,16 +1,13 @@
 import 'dart:convert';
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:aiml_mobile_2024/widget/CommonScaffold.dart';
 import 'PostDetailPage.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:convert';
 import 'package:aiml_mobile_2024/screens/WritePost.dart';
-import 'package:aiml_mobile_2024/screens/Community.dart';
 
 class Community extends StatefulWidget {
   @override
@@ -36,11 +33,22 @@ class _CommunityState extends State<Community> {
   @override
   void initState() {
     super.initState();
-    _fetchMapData();
     _getCurrentLocation();
     fetchPosts(); // API 호출
   }
 
+  Future<void> _getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      setState(() {
+        _currentPosition = position;
+      });
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
   // Post 데이터를 가져오는 함수
   Future<void> fetchPosts() async {
     final response = await http.get(Uri.parse('http://13.209.84.51:8081/post/'));
@@ -71,63 +79,11 @@ class _CommunityState extends State<Community> {
     );
   }
 
-  Future<void> _fetchMapData() async {
-    final String clientId = 'vbuyb9r3k9';
-    final String clientSecret = 'BfVUIMtidWxbl2oknXpImwn8hbjcphnWHSr6LPty';
-    final String apiUrl = 'https://naveropenapi.apigw.ntruss.com/map-static/v2/raster?w=1170&h=1170&center=127.1054221,37.3591614&level=16';
-
-    final headers = {
-      'X-NCP-APIGW-API-KEY-ID': clientId,
-      'X-NCP-APIGW-API-KEY': clientSecret,
-    };
-
-    try {
-      final response = await http.get(Uri.parse(apiUrl), headers: headers);
-
-      if (response.statusCode == 200) {
-        final imageBytes = response.bodyBytes;
-        final image = Image.memory(imageBytes);
-        setState(() {
-          mapImage = image;
-        });
-      } else {
-        throw Exception('Failed to fetch map data');
-      }
-    } catch (e) {
-      print('Error fetching map data: $e');
-    }
-  }
-
-  Future<void> _getCurrentLocation() async {
-    try {
-      LocationPermission permission = await Geolocator.requestPermission();
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      setState(() {
-        _currentPosition = position;
-      });
-      if (_controller != null) {
-        _controller!.updateCamera(
-          NCameraUpdate.scrollAndZoomTo(
-            target: NLatLng(
-              _currentPosition!.latitude,
-              _currentPosition!.longitude,
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      print("Error: $e");
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-      title: Text('커뮤니티'),),
-      body: Column(
+    return Center(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (_currentPosition != null)

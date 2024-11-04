@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:convert';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:geolocator/geolocator.dart';
 import '../service/InfraInfoService.dart';
-
+import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class InfraScreen extends StatefulWidget {
   @override
@@ -21,39 +18,15 @@ class _InfraScreenState extends State<InfraScreen> {
   List<NMarker> markers = [];
   Position? _currentPosition;
   NaverMapController? _controller;
-  String? selectedLocation;
+  String? selectedLocation = '병원';
   bool showList = false; // 리스트가 보일지 여부를 제어하는 변수
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
-  }
-
-  Future<void> _getCurrentLocation() async {
-    try {
-      LocationPermission permission = await Geolocator.requestPermission();
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      setState(() {
-        _currentPosition = position;
-      });
-      if (_controller != null) {
-        _controller!.updateCamera(
-          NCameraUpdate.scrollAndZoomTo(
-            target: NLatLng(
-              _currentPosition!.latitude,
-              _currentPosition!.longitude,
-            ),
-          ),
-        );
-      }
-      _fetchHospitals();
-      _fetchPharmacies();
-    } catch (e) {
-      print("Error: $e");
-    }
+    _fetchHospitals();
+    _fetchPharmacies();
   }
 
   Future<void> _fetchHospitals() async {
@@ -63,29 +36,8 @@ class _InfraScreenState extends State<InfraScreen> {
           _currentPosition!.latitude,
           _currentPosition!.longitude,
         );
-
-        final List<Hospital> nearbyHospitals = [];
-        for (var hospital in _hospitals) {
-          double distanceInMeters = Geolocator.distanceBetween(
-            _currentPosition!.latitude,
-            _currentPosition!.longitude,
-            hospital.latitude,
-            hospital.longitude, // Replace with the actual field from your Hospital object
-          );
-          hospital.distance = distanceInMeters / 1000; // Convert to kilometers
-
-          // Filter hospitals within 10 kilometers
-          if (hospital.distance <= 10) {
-            nearbyHospitals.add(hospital);
-          }
-        }
-
-        // Sort hospitals by distance
-        nearbyHospitals.sort((a, b) => a.distance.compareTo(b.distance));
-
-
         setState(() {
-          _hospitals = nearbyHospitals;
+          _hospitals = data;
         });
         _updateMarkers();
       } catch (e) {
@@ -113,25 +65,46 @@ class _InfraScreenState extends State<InfraScreen> {
 
   void _updateMarkers() {
     setState(() {
-      markers = [];
+      markers = []; // Clear the existing markers
+      List<NMarker> newMarkers = []; // Create a new list for markers
+
       if (selectedLocation == '병원') {
-        markers = _hospitals.map((hospital) {
-          return NMarker(
+        newMarkers = _hospitals.map((hospital) {
+          final NMarker marker = NMarker(
             id: hospital.name,
             position: NLatLng(hospital.latitude, hospital.longitude),
           );
+
+          // Correctly set the onTap listener
+          marker.setOnTapListener((NMarker tappedMarker) {
+            String url = 'nmap://route/walk?slat=${_currentPosition!.latitude}&slng=${_currentPosition!.longitude}&sname=%EC%84%9C%EC%9A%B8%EB%8C%80%ED%95%99%EA%B5%90&dlat=${hospital.latitude}&dlng=${hospital.longitude}&dname=${hospital.name}&appname=com.example.aiml_mobile_2024';
+            launch(url); // Ensure you have imported url_launcher
+          });
+
+          return marker;
         }).toList();
+
       } else if (selectedLocation == '약국') {
-        markers = _pharmacies.map((pharmacy) {
-          return NMarker(
+        newMarkers = _pharmacies.map((pharmacy) {
+          final NMarker marker = NMarker(
             id: pharmacy.name,
             position: NLatLng(pharmacy.latitude, pharmacy.longitude),
           );
+
+          // Correctly set the onTap listener
+          marker.setOnTapListener((NMarker tappedMarker) {
+            String url = 'nmap://route/walk?slat=${_currentPosition!.latitude}&slng=${_currentPosition!.longitude}&sname=%EC%84%9C%EC%9A%B8%EB%8C%80%ED%95%99%EA%B5%90&dlat=${pharmacy.latitude}&dlng=${pharmacy.longitude}&dname=${pharmacy.name}&appname=com.example.aiml_mobile_2024';
+            launch(url); // Ensure you have imported url_launcher
+          });
+
+          return marker;
         }).toList();
       }
 
+      // Clear existing overlays and add new markers to the map
       if (_controller != null) {
         _controller!.clearOverlays().then((_) {
+          markers = newMarkers; // Assign new markers here
           for (var marker in markers) {
             _controller!.addOverlay(marker).catchError((e) {
               print('Error adding marker: $e');
@@ -145,6 +118,20 @@ class _InfraScreenState extends State<InfraScreen> {
   }
 
 
+  Future<void> _getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      setState(() {
+        _currentPosition = position;
+      });
+      _fetchHospitals();
+      _fetchPharmacies();
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,15 +142,13 @@ class _InfraScreenState extends State<InfraScreen> {
           Expanded(
             child: Stack(
               children: [
-                AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
-
-                  child: NaverMap(
+                if(_currentPosition != null)
+                  NaverMap(
                     options: NaverMapViewOptions(
                       initialCameraPosition: NCameraPosition(
                         target: NLatLng(
-                          _currentPosition?.latitude ?? 37.5665,
-                          _currentPosition?.longitude ?? 126.9780,
+                          _currentPosition!.latitude,
+                          _currentPosition!.longitude,
                         ),
                         zoom: 14,
                       ),
@@ -172,13 +157,6 @@ class _InfraScreenState extends State<InfraScreen> {
                       setState(() {
                         _controller = controller;
                       });
-
-                      _controller!.updateCamera(
-                        NCameraUpdate.scrollAndZoomTo(
-                          target: NLatLng(_currentPosition!.latitude, _currentPosition!.longitude,
-                          ),
-                        ),
-                      );
                     },
                     onMapTapped: (point, latLng) {
                       // 지도를 클릭하면 리스트를 닫고 지도를 확장
@@ -187,7 +165,7 @@ class _InfraScreenState extends State<InfraScreen> {
                       });
                     },
                   ),
-                ),
+
                 Positioned(
                   top: 20,
                   left: 20,
@@ -252,27 +230,56 @@ class _InfraScreenState extends State<InfraScreen> {
             ),
           ),
           if (showList)
-            Container(
-              height: MediaQuery.of(context).size.height * 0.3,
+            Expanded(
               child: selectedLocation == '병원'
                   ? ListView.builder(
                 itemCount: _hospitals.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
+                  final hospital = _hospitals[index];
+                  return InkWell(
+                      onTap: () async {
+                    final String hospitalName = Uri.encodeComponent(hospital.name);
+                    final String url = 'nmap://route/walk?slat=${_currentPosition!.latitude}&slng=${_currentPosition!.longitude}&sname=현재위치&dlat=${hospital.latitude}&dlng=${hospital.longitude}&dname=$hospitalName&appname=com.example.aiml_mobile_2024';
+                    final Uri uri = Uri.parse(url);
+
+                    if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri);
+                  } else {
+                  print('Could not launch $url');
+                  }
+                  },
+                  child: ListTile(
                     title: Text(_hospitals[index].name),
                     subtitle: Text(
                       '${_hospitals[index].distance?.toStringAsFixed(2)} km',
                     ),
+                  )
                   );
                 },
-              ) : ListView.builder(
+              )
+                  : ListView.builder(
                 itemCount: _pharmacies.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(_pharmacies[index].name),
-                    subtitle: Text (
+                  final pharmacy = _pharmacies[index];
+
+                  return InkWell(
+                      onTap: () async {
+                        final String hospitalName = Uri.encodeComponent(pharmacy.name);
+                        final String url = 'nmap://route/walk?slat=${_currentPosition!.latitude}&slng=${_currentPosition!.longitude}&sname=현재위치&dlat=${pharmacy.latitude}&dlng=${pharmacy.longitude}&dname=$hospitalName&appname=com.example.aiml_mobile_2024';
+                        final Uri uri = Uri.parse(url);
+
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri);
+                      } else {
+                          print('Could not launch $url');
+                          }
+                        },
+                    child:ListTile(
+                      title: Text(_pharmacies[index].name),
+                      subtitle: Text (
                       '${_pharmacies[index].distance?.toStringAsFixed(2)} km',
                     ),
+                  )
                   );
                 },
               ),
