@@ -46,11 +46,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-
+      debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => HomeScreenAfterLogin(),
+        '/': (context) => HomeScreen(),
         // 임시로 회원가입으로 해놓은 화면
+        '/home' :(context)=>HomeScreen(),
         '/infra_info': (context) => InfraScreen(),
         '/navigator': (context) => ShelterLocationScreen(),
         '/search_missing_person': (context) => FriendLocation(),

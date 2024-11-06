@@ -19,7 +19,7 @@ class _SignInState extends State<SignIn> {
     // String id = _idController.text; // 'id'로 변경
     // String password = _passwordController.text;
 
-    final url = Uri.parse('http://13.209.84.51:8081/api/login');
+    final url = Uri.parse('http://3.34.139.173:8081/api/login');
 
     final response = await http.post(
       url,

@@ -12,6 +12,7 @@ import 'package:csv/csv.dart';
 import 'dart:typed_data';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:aiml_mobile_2024/service/token_storage.dart';
 
 class ShelterLocationScreen extends StatefulWidget {
   @override
@@ -22,6 +23,7 @@ class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
   final String naverApiKey = 'BfVUIMtidWxbl2oknXpImwn8hbjcphnWHSr6LPty';
   Image? mapImage;
   String? selectedLocation;
+  String userId = '';
   List<Shelter> _shelters = [];
   List<NMarker> markers = [];
   Position? _currentPosition;
@@ -32,9 +34,35 @@ class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
   @override
   void initState() {
     super.initState();
+    fetchUserId();
     _fetchMapData();
     _getCurrentLocation();
   }
+
+  Future<void> fetchUserId() async {
+    String? jwtToken = await getJwtToken();
+
+    if (jwtToken != null) {
+      final response = await http.get(
+        Uri.parse('http://3.34.139.173:8081/api/member/info'),
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var userData = jsonDecode(response.body);
+        setState(() {
+          userId = userData['id'] ?? 'Unknown'; // 사용자 ID 저장
+        });
+      } else {
+        print("Failed to load user info: ${response.statusCode}, ${response.body}");
+      }
+    } else {
+      print("JWT Token is missing");
+    }
+  }
+
 
   Future<void> _fetchMapData() async {
     final String clientId = 'vbuyb9r3k9';
@@ -167,6 +195,24 @@ class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
     }
   }
 
+  Future<String?> _getShelterRouteUrl(Shelter shelter) async {
+    final String apiUrl = 'http://3.34.139.173:8081/geocoding/$userId'; // 실제 API 주소로 수정
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        return response.body; // 반환된 URL을 사용
+      } else {
+        throw Exception('Failed to load route URL');
+      }
+    } catch (e) {
+      print('Error fetching route URL: $e');
+      return null;
+    }
+  }
+
+
 
 
   @override
@@ -269,16 +315,19 @@ class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
                 return InkWell(
                   onTap: () async {
                     final String shelterName = Uri.encodeComponent(shelter.InfraName);
-                     final url = 'nmap://route/walk?slat=_currentPosition!.latitude&slng=_currentPosition!.longitude&sname=%EC%84%9C%EC%9A%B8%EB%8C%80%ED%95%99%EA%B5%90&dlat=${shelter.latitude_EPSG4326}&dlng=${shelter.longitude_EPSG4326}&dname=$shelterName&appname=com.example.aiml_mobile_2024';
-                    ;
-                    final Uri uri = Uri.parse(url);
-
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri);
+                    final routeUrl = await _getShelterRouteUrl(shelter);
+                    if (routeUrl != null) {
+                      final Uri uri = Uri.parse(routeUrl);
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri);
+                      } else {
+                        print('Could not launch $routeUrl');
+                      }
                     } else {
-                      print('Could not launch $url');
+                      print('Failed to get route URL');
                     }
                   },
+
                   child: ListTile(
                     title: Row(
                       children: [

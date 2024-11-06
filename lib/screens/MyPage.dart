@@ -5,6 +5,8 @@ import 'package:aiml_mobile_2024/screens/HomeScreen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:geolocator/geolocator.dart';
 
 class MyPage extends StatefulWidget{
   //const Member({Key? key}) : super(key: key);
@@ -15,19 +17,43 @@ class MyPage extends StatefulWidget{
 class _MyPageState extends State<MyPage> {
   String userName = '';
   String userPhone = '';
+  String userId = '';
+  Position? _currentPosition; // 현재 위치 저장
+  String locationName='';
+  bool isLocationSaved = false; // 위치 저장 여부 추적
+
 
   @override
   void initState() {
     super.initState();
+    requestLocationPermission();
     fetchUserInfo(); // 페이지 로드 시 사용자 정보 가져오기
   }
+
+  Future<void> requestLocationPermission() async {
+    var status = await Permission.location.request();
+    await _getCurrentLocation();
+    // if (status.isGranted) {
+    //   // 권한이 허용되었습니다.
+    //   print("Location permission granted");
+    //   await _getCurrentLocation(); // 위치 정보를 가져옵니다.
+    // } else if (status.isDenied) {
+    //   // 권한이 거부되었습니다.
+    //   print("Location permission denied");
+    // } else if (status.isPermanentlyDenied) {
+    //   // 사용자 설정에서 권한을 영구적으로 거부한 경우
+    //   print("Location permission permanently denied");
+    //   openAppSettings(); // 사용자에게 앱 설정으로 이동하도록 안내합니다.
+    // }
+  }
+
 
   Future<void> fetchUserInfo() async {
     String? jwtToken = await getJwtToken();
 
     if (jwtToken != null) {
       final response = await http.get(
-        Uri.parse('http://13.209.84.51:8081/api/member/info'),
+        Uri.parse('http://3.34.139.173:8081/api/member/info'),
         headers: {
           'Authorization': 'Bearer $jwtToken',
         },
@@ -36,6 +62,7 @@ class _MyPageState extends State<MyPage> {
       if (response.statusCode == 200) {
         var userData = jsonDecode(response.body);
         setState(() {
+          userId =userData['id'] ?? 'Unknown';
           userName = userData['name'] ?? 'Unknown'; // name이 null이면 'Unknown'
           userPhone = userData['phoneNum'] ?? 'No phone';
         });
@@ -45,6 +72,69 @@ class _MyPageState extends State<MyPage> {
       }
     } else {
       print("JWT Token is missing");
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      _currentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      print("Current Location: $_currentPosition");
+      await _getLocationName();
+      await saveLocation();
+    } catch (e) {
+      print("Could not get the Location; $e");
+    }
+  }
+
+  Future<void> _getLocationName() async {
+    final latitude = _currentPosition!.latitude;
+    final longitude = _currentPosition!.longitude;
+
+    final response = await http.get(
+      Uri.parse('https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=AIzaSyAWxd0Oro0zSSYhUMaKnlf1rOf-3O_tOhI'),
+    );
+
+    if (response.statusCode == 200) {
+      var jsonResponse = jsonDecode(response.body);
+      if (jsonResponse['results'].isNotEmpty) {
+        setState(() {
+          locationName = jsonResponse['results'][0]['formatted_address']; // 첫 번째 주소를 사용
+        });
+      }
+    } else {
+      print("Failed to get location name: ${response.statusCode}");
+    }
+  }
+
+  Future<void> saveLocation() async {
+    if (_currentPosition != null) {
+      final locationData = {
+        "id": userId,
+        "locationName": locationName, // 자동으로 가져온 위치 이름
+        "latitude": _currentPosition!.latitude.toString(),
+        "longitude": _currentPosition!.longitude.toString(),
+      };
+      print("Location data to be sent: $locationData");
+
+      String? jwtToken = await getJwtToken();
+
+      final response = await http.post(
+        Uri.parse('http://3.34.139.173:8081/geocoding/userlocation'),
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(locationData),
+      );
+
+      if (response.statusCode == 200) {
+        print("Location saved successfully!");
+        setState(() {
+          isLocationSaved = true; // 위치가 성공적으로 저장됨
+        });
+      } else {
+        print("Failed to save location: ${response.statusCode}, ${response.body}");
+      }
     }
   }
 
@@ -84,7 +174,7 @@ class _MyPageState extends State<MyPage> {
   Widget build(BuildContext context) {
     return CommonScaffold(
       title: Text('MyPage'),
-    pages: [Align(
+      pages: [Align(
         alignment: Alignment(0.0, -0.6),
         child: Container(
           width: 385, // Box width
@@ -122,25 +212,12 @@ class _MyPageState extends State<MyPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(
-                            '$userName', // Display fetched name
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text(
-                            '$userPhone', // Display fetched phone number
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              color: Colors.black,
-                            ),
-                          ),
+
                           SizedBox(height: 5.0), // Spacing between elements
                           Text(
                             userName.isNotEmpty ? userName : '이름을 불러오는 중...',
                             style: TextStyle(
-                              fontSize: 16.0,
+                              fontSize: 18.0,
                             ),
                             textAlign: TextAlign.right,
                           ),
@@ -150,7 +227,7 @@ class _MyPageState extends State<MyPage> {
                                 ? userPhone
                                 : '전화번호를 불러오는 중...',
                             style: TextStyle(
-                              fontSize: 11.0,
+                              fontSize: 14.0,
                               color: Colors.grey,
                             ),
                           ),
@@ -164,10 +241,10 @@ class _MyPageState extends State<MyPage> {
                   children: <Widget>[
                     ElevatedButton(
                       onPressed: () {
-                       // Navigator.push(
+                        // Navigator.push(
                         //context,
-                       // MaterialPageRoute(builder: (context) => ChangeInfo(documentId:documentId),),
-                       // );
+                        // MaterialPageRoute(builder: (context) => ChangeInfo(documentId:documentId),),
+                        // );
                       },
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.black,foregroundColor: Colors.white),
                       child: Text('회원정보 수정'),
@@ -190,7 +267,7 @@ class _MyPageState extends State<MyPage> {
           ),
         ),
       ),
-    ],
+      ],
     );
   }
 }

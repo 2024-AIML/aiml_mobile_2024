@@ -124,7 +124,7 @@ class HomeScreen extends StatelessWidget {
         Community(),               // Page 1 - 내 주변
         ShelterLocationScreen(),     // Page 2 - 길 안내
         FriendLocation(),            // Page 3 - 친구 찾기
-        ShowCustomSearchMessage(),   // Page 4 - 재난 문자 목록
+        ShowCustomSearchMessage()   // Page 4 - 재난 문자 목록
     ],
     );
   }
