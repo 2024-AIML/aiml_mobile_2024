@@ -109,57 +109,49 @@ class _FriendLocationState extends State<FriendLocation> {
           // Search Bar
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
-              height: 60,
-              child: Row(
-                children: [
-                  Positioned(
-                    top: 3.0,
-                    left: 16.0,
-                    child: IconButton(
-                      onPressed: () {
-                        _showAddFriendDialog(context);
-                      },
-                      icon: Icon(Icons.person_add),
-                    ),
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: searchController,
-                      decoration: InputDecoration(
-                        labelText: '검색',
-                        labelStyle: TextStyle(color: Colors.green[900]),
-                        hintText: '친구 이름을 입력하세요',
-                        prefixIcon: Icon(Icons.search),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                          borderSide: BorderSide(color: Colors.green[900]!),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    _showAddFriendDialog(context);
+                  },
+                  icon: Icon(Icons.person_add),
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      labelText: '검색',
+                      labelStyle: TextStyle(color: Colors.green[900]),
+                      hintText: '친구 이름을 입력하세요',
+                      prefixIcon: Icon(Icons.search),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        borderSide: BorderSide(color: Colors.green[900]!),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        borderSide: BorderSide(color: Colors.grey),
                       ),
                     ),
                   ),
-                  SizedBox(width: 10.0),
-                  ElevatedButton(
-                    onPressed: _search,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Icon(Icons.search),
+                ),
+                SizedBox(width: 10.0),
+                ElevatedButton(
+                  onPressed: _search,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
                   ),
-                ],
-              ),
+                  child: Icon(Icons.search),
+                ),
+              ],
             ),
           ),
           // Map and Friends List
           Expanded(
             child: Stack(
               children: [
-                // Naver Map
                 if (_currentPosition != null)
                   NaverMap(
                     options: NaverMapViewOptions(
@@ -177,20 +169,16 @@ class _FriendLocationState extends State<FriendLocation> {
                       });
                     },
                   ),
-                // Loading Indicator
                 if (isLoading)
                   Center(child: CircularProgressIndicator()),
-
-                // Friends List in a DraggableScrollableSheet
                 DraggableScrollableSheet(
-                  initialChildSize: 0.4, // Adjust initial size as needed
+                  initialChildSize: 0.4,
                   minChildSize: 0.3,
                   maxChildSize: 0.7,
                   builder: (context, scrollController) {
                     return Container(
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.9),
-                        // Semi-transparent background
                         borderRadius: BorderRadius.vertical(top: Radius
                             .circular(16)),
                       ),

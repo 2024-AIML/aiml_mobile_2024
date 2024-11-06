@@ -115,15 +115,14 @@ class _ShowFirstThreeMessagesState extends State<ShowFirstThreeMessages> {
 
 class HomeScreenAfterLogin extends StatelessWidget {
 
-
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      title: Text(''), // You can set a title if needed
+      title: Text(''),
       pages: [
         Stack(
           children: [
-            Center(child: _buildHomeContent()), // Correct usage without extra comma
+            Center(child: _buildHomeContent()),
 
             Positioned(
               top: 3.0,
@@ -258,7 +257,7 @@ class HomeScreenAfterLogin extends StatelessWidget {
           ),
 
 
-SizedBox(height: 30),
+      SizedBox(height: 30),
           // ---------------게시판 ------------------------------------
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -425,122 +424,4 @@ void _showMenu(BuildContext context) {
       );
     },
   );
-
-  void _showOptionsModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              ListTile(
-                leading: const Icon(Icons.person),
-                title: const Text('마이페이지'),
-                onTap: () {
-                  Navigator.pop(context); // Close the modal
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => MyPage()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.person_search_outlined),
-                title: const Text('친구추가'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AddFriend()),
-                  );
-                },
-              ),
-              ListTile(
-                  leading: const Icon(Icons.group_add_outlined),
-                  title: const Text('친구요청'),
-                  onTap:(){
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context)=>  NotificationsPage(senderUserId: '',)),
-                    );
-                  }
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.login),
-                title: const Text('로그인'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SignIn()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.app_registration),
-                title: const Text('회원가입'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context)=> JoinMember()),
-                  );
-                },
-              ),
-              ListTile(
-                  leading: const Icon(Icons.logout),
-                  title: const Text('로그아웃'),
-                  onTap:(){
-                    Navigator.pop(context);
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()),);
-                  }
-              )
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _showMenu(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              ListTile(
-                title: const Text('모스부호 변환기'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => MorseCodePage()),
-                  );
-                },
-              ),
-              ListTile(
-                title: const Text('행동 지침 안내'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => GuidelinePage()),
-                  );
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-
 }

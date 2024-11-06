@@ -19,7 +19,7 @@ class _MyPageState extends State<MyPage> {
   String userPhone = '';
   String userId = '';
   Position? _currentPosition; // 현재 위치 저장
-  String locationName='';
+  String locationName = '';
   bool isLocationSaved = false; // 위치 저장 여부 추적
 
 
@@ -62,7 +62,7 @@ class _MyPageState extends State<MyPage> {
       if (response.statusCode == 200) {
         var userData = jsonDecode(response.body);
         setState(() {
-          userId =userData['id'] ?? 'Unknown';
+          userId = userData['id'] ?? 'Unknown';
           userName = userData['name'] ?? 'Unknown'; // name이 null이면 'Unknown'
           userPhone = userData['phoneNum'] ?? 'No phone';
         });
@@ -77,7 +77,8 @@ class _MyPageState extends State<MyPage> {
 
   Future<void> _getCurrentLocation() async {
     try {
-      _currentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      _currentPosition = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
       print("Current Location: $_currentPosition");
       await _getLocationName();
       await saveLocation();
@@ -91,14 +92,16 @@ class _MyPageState extends State<MyPage> {
     final longitude = _currentPosition!.longitude;
 
     final response = await http.get(
-      Uri.parse('https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=AIzaSyAWxd0Oro0zSSYhUMaKnlf1rOf-3O_tOhI'),
+      Uri.parse(
+          'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=AIzaSyAWxd0Oro0zSSYhUMaKnlf1rOf-3O_tOhI'),
     );
 
     if (response.statusCode == 200) {
       var jsonResponse = jsonDecode(response.body);
       if (jsonResponse['results'].isNotEmpty) {
         setState(() {
-          locationName = jsonResponse['results'][0]['formatted_address']; // 첫 번째 주소를 사용
+          locationName =
+          jsonResponse['results'][0]['formatted_address']; // 첫 번째 주소를 사용
         });
       }
     } else {
@@ -133,7 +136,8 @@ class _MyPageState extends State<MyPage> {
           isLocationSaved = true; // 위치가 성공적으로 저장됨
         });
       } else {
-        print("Failed to save location: ${response.statusCode}, ${response.body}");
+        print("Failed to save location: ${response.statusCode}, ${response
+            .body}");
       }
     }
   }
@@ -172,102 +176,112 @@ class _MyPageState extends State<MyPage> {
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      title: Text('MyPage'),
-      pages: [Align(
-        alignment: Alignment(0.0, -0.6),
-        child: Container(
-          width: 385, // Box width
-          height: 208, // Box height
-          color: Colors.white, // Box color
-          child: Padding(
-            padding: EdgeInsets.only(top: 10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  width: 360,
-                  height: 140,
-                  color: Colors.white,
-                  child: Row(
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(left: 30.0),
-                        child: ClipOval(
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            color: Colors.white,
-                            child: Image.asset(
-                              'assets/image/user.png',
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 20), // Spacing between image and text
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('MyPage'),
+      ),
+      body: Column( // Wrap the list in a Column to provide multiple children
+        children: [
+          Align(
+            alignment: Alignment(0.0, -0.6),
+            child: Container(
+              width: 385, // Box width
+              height: 208, // Box height
+              color: Colors.white, // Box color
+              child: Padding(
+                padding: EdgeInsets.only(top: 10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      width: 360,
+                      height: 140,
+                      color: Colors.white,
+                      child: Row(
                         children: <Widget>[
-
-                          SizedBox(height: 5.0), // Spacing between elements
-                          Text(
-                            userName.isNotEmpty ? userName : '이름을 불러오는 중...',
-                            style: TextStyle(
-                              fontSize: 18.0,
+                          Padding(
+                            padding: EdgeInsets.only(left: 30.0),
+                            child: ClipOval(
+                              child: Container(
+                                width: 100,
+                                height: 100,
+                                color: Colors.white,
+                                child: Image.asset(
+                                  'assets/image/user.png',
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
-                            textAlign: TextAlign.right,
                           ),
-                          SizedBox(height: 5.0), // Spacing between elements
-                          Text(
-                            userPhone.isNotEmpty
-                                ? userPhone
-                                : '전화번호를 불러오는 중...',
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              color: Colors.grey,
-                            ),
+                          SizedBox(width: 20), // Spacing between image and text
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              SizedBox(height: 5.0), // Spacing between elements
+                              Text(
+                                userName.isNotEmpty
+                                    ? userName
+                                    : '이름을 불러오는 중...',
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                ),
+                                textAlign: TextAlign.right,
+                              ),
+                              SizedBox(height: 5.0), // Spacing between elements
+                              Text(
+                                userPhone.isNotEmpty
+                                    ? userPhone
+                                    : '전화번호를 불러오는 중...',
+                                style: TextStyle(
+                                  fontSize: 14.0,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    ElevatedButton(
-                      onPressed: () {
-                        // Navigator.push(
-                        //context,
-                        // MaterialPageRoute(builder: (context) => ChangeInfo(documentId:documentId),),
-                        // );
-                      },
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.black,foregroundColor: Colors.white),
-                      child: Text('회원정보 수정'),
                     ),
-                    SizedBox(width: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomeScreen()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.black,foregroundColor: Colors.white),
-                      child: Text('로그아웃'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        ElevatedButton(
+                          onPressed: () {
+                            // Navigation logic for ChangeInfo screen
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text('회원정보 수정'),
+                        ),
+                        SizedBox(width: 20),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomeScreen()),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text('로그아웃'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
-      ],
     );
   }
 }
