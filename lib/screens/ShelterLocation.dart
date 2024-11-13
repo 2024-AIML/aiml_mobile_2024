@@ -44,7 +44,7 @@ class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
 
     if (jwtToken != null) {
       final response = await http.get(
-        Uri.parse('http://3.34.139.173:8081/api/member/info'),
+        Uri.parse('http://43.202.6.121:8081/api/member/info'),
         headers: {
           'Authorization': 'Bearer $jwtToken',
         },
@@ -196,7 +196,8 @@ class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
   }
 
   Future<String?> _getShelterRouteUrl(Shelter shelter) async {
-    final String apiUrl = 'http://3.34.139.173:8081/geocoding/$userId'; // 실제 API 주소로 수정
+    final String encodedShelterName = Uri.encodeComponent(shelter.InfraName);
+    final String apiUrl = 'http://43.202.6.121:8081/geocoding/$userId/$encodedShelterName'; // 실제 API 주소로 수정
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -317,9 +318,9 @@ class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
                     final String shelterName = Uri.encodeComponent(shelter.InfraName);
                     final routeUrl = await _getShelterRouteUrl(shelter);
                     if (routeUrl != null) {
-                      final Uri uri = Uri.parse(routeUrl);
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri);
+                      final Uri url = Uri.parse(routeUrl);
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url);
                       } else {
                         print('Could not launch $routeUrl');
                       }
@@ -336,6 +337,7 @@ class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
                           child: Text(
                             shelter.InfraName,
                             overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 10),
                           ),
                         ),
                         Spacer(),

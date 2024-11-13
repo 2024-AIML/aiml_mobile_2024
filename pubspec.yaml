@@ -49,6 +49,7 @@ dependencies:
   url_launcher: ^6.2.6
   path_provider: ^2.0.11
   csv: ^5.0.0
+  shared_preferences: ^2.0.8
 
 dev_dependencies:
   flutter_test:

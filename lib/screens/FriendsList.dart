@@ -11,6 +11,7 @@ class FriendsList extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('User Friends'),
+        backgroundColor: Colors.white,
         actions: [
           IconButton(
             icon: Icon(Icons.notifications),
@@ -24,6 +25,7 @@ class FriendsList extends StatelessWidget {
           ),
         ],
       ),
+      backgroundColor: Colors.white,
       body: UserFriendsList(),
       floatingActionButton: Positioned(
         top: 0,

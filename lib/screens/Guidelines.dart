@@ -9,8 +9,10 @@ class GuidelinePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('행동지침안내'), // Title of the AppBar
+        title: Text('행동지침안내'),
+        backgroundColor: Colors.white,// Title of the AppBar
       ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0), // Padding around the content
         child: GridView.count(

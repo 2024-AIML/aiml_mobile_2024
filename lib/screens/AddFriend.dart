@@ -97,7 +97,9 @@ class AddFriend extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('친구 추가'),
+        backgroundColor: Colors.white,
       ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -183,7 +185,7 @@ class AddFriend extends StatelessWidget {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green[900],
+                backgroundColor: Colors.black,
               ),
               child: Text(
                 '검색',
@@ -203,7 +205,7 @@ class AddFriend extends StatelessWidget {
         },
         child: Icon(Icons.notifications, color: Colors.white,),
         tooltip: 'Notifications',
-        backgroundColor: Colors.green[900],
+        backgroundColor: Colors.black
       ),
     );
   }

@@ -108,7 +108,9 @@ class _ChangeInfoState extends State<ChangeInfo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-      title: Text('회원정보 수정'),),
+      title: Text('회원정보 수정'),
+        backgroundColor: Colors.white,),
+      backgroundColor: Colors.white,
      body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(20.0),

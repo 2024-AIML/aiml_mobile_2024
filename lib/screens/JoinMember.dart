@@ -17,7 +17,7 @@ class _JoinMemberState extends State<JoinMember> {
 
 
   Future<void> _Join(String id, String password, String name, String phoneNum) async {
-    final url = Uri.parse('http://3.34.139.173:8081/api/member');
+    final url = Uri.parse('http://43.202.6.121.173:8081/api/member');
 
     final response = await http.post(
       url,
@@ -40,8 +40,10 @@ class _JoinMemberState extends State<JoinMember> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('회원가입, 나중에 이 Text 삭제 예정'),
+        title: Text('회원가입'),
+        backgroundColor: Colors.white,
       ),
+      backgroundColor: Colors.white,
       body: Padding(padding: EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -102,7 +104,7 @@ class _JoinMemberState extends State<JoinMember> {
               ElevatedButton(onPressed: () {
                 _Join(_idController.text, _passwordController.text, _nameController.text, _phoneNumController.text);
               },
-                style: ElevatedButton.styleFrom(backgroundColor:Colors.green[900],foregroundColor: Colors.white),
+                style: ElevatedButton.styleFrom(backgroundColor:Colors.black,foregroundColor: Colors.white),
                 child: Text('회원가입'),)
             ],
           )),

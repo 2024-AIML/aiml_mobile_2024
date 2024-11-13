@@ -6,7 +6,9 @@ class CprGuideline extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('심폐소생술 가이드라인'),
+        backgroundColor: Colors.white,
       ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(

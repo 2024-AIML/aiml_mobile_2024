@@ -17,7 +17,9 @@ class MorseCodePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('모스부호 변환'),
+        backgroundColor: Colors.white,
       ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(

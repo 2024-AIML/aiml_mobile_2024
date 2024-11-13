@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widget/CommonScaffold.dart'; // CommonScaffold를 import
 import '../service/HttpServiceForAPI.dart'; // API 호출을 위한 HttpService import
 
 class ShowCustomSearchMessage extends StatefulWidget {
@@ -77,6 +76,7 @@ class _ShowCustomSearchMessageState extends State<ShowCustomSearchMessage> {
               itemCount: _filteredMessages.length,
               itemBuilder: (context, index) {
                 return Card(
+                  color: Colors.white,
                   margin: EdgeInsets.all(10.0),
                   shape: RoundedRectangleBorder(
                     side: BorderSide(

@@ -40,7 +40,9 @@ class _SearchFriendState extends State<SearchFriend> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-      title: Text ('Search Bar')),
+      title: Text ('Search Bar'),
+        backgroundColor: Colors.white,),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(

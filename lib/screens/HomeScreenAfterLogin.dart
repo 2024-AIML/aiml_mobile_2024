@@ -1,11 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:aiml_mobile_2024/screens/Community.dart';
 import 'package:aiml_mobile_2024/screens/FriendsLocation.dart';
 import 'package:aiml_mobile_2024/screens/ShelterLocation.dart';
 import 'package:aiml_mobile_2024/screens/ShowCustomSearchMessage.dart';
-import 'SignIn.dart';
-import 'JoinMember.dart';
-import 'HomeScreen.dart';
 import 'package:flutter/material.dart';
 import '../widget/CommonScaffold.dart'; // Import for CommonScaffold
 import '../service/HttpServiceForAPI.dart'; // Import for API calls
@@ -53,7 +52,7 @@ class _ShowFirstThreeMessagesState extends State<ShowFirstThreeMessages> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Colors.green[100],
         borderRadius: BorderRadius.circular(10.0),
       ),
       height: 130, // 메시지 박스 높이 조정
@@ -112,13 +111,47 @@ class _ShowFirstThreeMessagesState extends State<ShowFirstThreeMessages> {
 }
 
 
+class HomeScreenAfterLogin extends StatefulWidget {
+  @override
+  _HomeScreenAfterLoginState createState() => _HomeScreenAfterLoginState();
+}
 
-class HomeScreenAfterLogin extends StatelessWidget {
+class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
+  List<Map<String, dynamic>> posts = [];
+
+  @override
+  void initState() {
+  super.initState();
+  fetchPosts();
+}
+
+
+  Future<void> fetchPosts() async {
+    final response = await http.get(Uri.parse('http://43.202.6.121:8081/post/'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
+
+      // 데이터를 Map 형식으로 변환 후 posts 리스트에 저장
+      setState(() {
+        posts = data.map((post) {
+          return {
+            'title': post['title'],
+            'content': post['content'],
+          };
+        }).toList();
+      });
+    } else {
+      throw Exception('Failed to load posts');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
       title: Text(''),
+
       pages: [
         Stack(
           children: [
@@ -157,56 +190,76 @@ class HomeScreenAfterLogin extends StatelessWidget {
   }
 
 
-
   Widget _buildHomeContent() {
     return SingleChildScrollView(
       child: Column(
         children: [
           SizedBox(height: 10),
+            Padding(padding: EdgeInsets.symmetric(horizontal: 20.0),
+           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    '안녕하세요,',
+                    style: TextStyle(
+                      fontSize: 28.0,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Text(
+                    ' 00 님!',
+                    style: TextStyle(
+                      fontSize: 28.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 60),
+            ],
+          ),
+            ),
 
+          SizedBox(height: 20.0),
+
+          // Notification Box
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.0), // Adjusts box padding from the sides
+            padding: EdgeInsets.symmetric(horizontal: 20.0),
             child: Container(
-              padding: EdgeInsets.all(20.0), // Padding inside the box
+              padding: EdgeInsets.all(20.0),
               decoration: BoxDecoration(
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(10.0),
-                //border: Border.all(color: Colors.grey),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    spreadRadius: 5,
+                    blurRadius: 10,
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Greeting text
                   Row(
                     children: [
+                      Icon(Icons.notifications_active, color: Colors.red[300],
+                          size: 24),
+                      SizedBox(width: 8.0),
                       Text(
-                        '안녕하세요,',
-                        style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.normal),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        ' 님!',
-                        style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 60),
-
-
-
-                  Row(
-                    children: [
-                      Text(
-                        '최근 안내 문자',
-                        style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+                        '재난알림',
+                        style: TextStyle(
+                            fontSize: 18.0, fontWeight: FontWeight.normal),
                       ),
                     ],
                   ),
                   SizedBox(height: 20.0),
-
                   Padding(
                     padding: EdgeInsets.zero,
                     child: ShowFirstThreeMessages(),
@@ -216,17 +269,9 @@ class HomeScreenAfterLogin extends StatelessWidget {
             ),
           ),
 
-          SizedBox(height: 30.0,),
+          SizedBox(height: 30.0),
 
-
-
-
-
-
-
-
-          // -------------------- 약국이랑 병원 등등 지도 표시하기 ---------------
-
+          // Nearby Places Section
           const Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -235,11 +280,13 @@ class HomeScreenAfterLogin extends StatelessWidget {
                 child: Text.rich(
                   TextSpan(
                     text: '지금 ',
-                    style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+                    style: TextStyle(
+                        fontSize: 16.0, fontWeight: FontWeight.normal),
                     children: [
                       TextSpan(
                         text: '내 주변은',
-                        style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold,),
+                        style: TextStyle(
+                            fontSize: 16.0, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -251,14 +298,14 @@ class HomeScreenAfterLogin extends StatelessWidget {
           SizedBox(
             height: 400.0,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust horizontal padding as needed
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: InfraScreen(),
             ),
           ),
 
+          SizedBox(height: 30),
 
-      SizedBox(height: 30),
-          // ---------------게시판 ------------------------------------
+          // Community Board Section
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -266,63 +313,34 @@ class HomeScreenAfterLogin extends StatelessWidget {
                 padding: EdgeInsets.only(left: 40.0),
                 child: Text(
                   '우리 동네 게시판',
-                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+                  style: TextStyle(
+                      fontSize: 20.0, fontWeight: FontWeight.normal),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 25.0),
+          posts.isNotEmpty
+              ? Column(
+            children: posts.take(3).map((post) {
+              return Container(
+                height: 80.0,
+                margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                child: Center(
+                  child: Text(
+                    post['title'] ?? '제목 없음',
+                    style: TextStyle(color: Colors.black, fontSize: 16.0),
+                  ),
+                ),
+              );
+            }).toList(),
+          )
+              : Center(child: CircularProgressIndicator()),
 
-
-
-
-          // ------- 게시판 글 불러오는 자리
-          // ---------- 여기부터는 임시로 넣어놓은 박스임
-          Container(
-            height: 80.0,
-            margin: EdgeInsets.symmetric(horizontal: 20.0),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            child: const Center(
-              child: Text(
-                '게시물 게시물 게시물',
-                style: TextStyle(color: Colors.black, fontSize: 16.0),
-              ),
-            ),
-          ),
-          SizedBox(height: 8.0,),
-          Container(
-            height: 80.0,
-            margin: EdgeInsets.symmetric(horizontal: 20.0),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            child: const Center(
-              child: Text(
-                '게시물 게시물 게시물',
-                style: TextStyle(color: Colors.black, fontSize: 16.0),
-              ),
-            ),
-          ),
-          SizedBox(height: 8.0,),
-          Container(
-            height: 80.0,
-            margin: EdgeInsets.symmetric(horizontal: 20.0),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            child: const Center(
-              child: Text(
-                '게시물 게시물 게시물',
-                style: TextStyle(color: Colors.black, fontSize: 16.0),
-              ),
-            ),
-          ),
-          SizedBox(height: 30.0,),
+          SizedBox(height: 30.0),
         ],
       ),
     );

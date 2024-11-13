@@ -53,7 +53,7 @@ class _MyPageState extends State<MyPage> {
 
     if (jwtToken != null) {
       final response = await http.get(
-        Uri.parse('http://3.34.139.173:8081/api/member/info'),
+        Uri.parse('http://43.202.6.121:8081/api/member/info'),
         headers: {
           'Authorization': 'Bearer $jwtToken',
         },
@@ -122,7 +122,7 @@ class _MyPageState extends State<MyPage> {
       String? jwtToken = await getJwtToken();
 
       final response = await http.post(
-        Uri.parse('http://3.34.139.173:8081/geocoding/userlocation'),
+        Uri.parse('http://43.202.6.121:8081/geocoding/userlocation'),
         headers: {
           'Authorization': 'Bearer $jwtToken',
           'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ class _MyPageState extends State<MyPage> {
 
     if (jwtToken != null) {
       final response = await http.post(
-        Uri.parse('http://localhost:8081/logout'),
+        Uri.parse('http://43.202.6.121:8081/logout'),
         headers: {
           'Authorization': 'Bearer $jwtToken',
         },
@@ -179,7 +179,9 @@ class _MyPageState extends State<MyPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('MyPage'),
+        backgroundColor: Colors.white,
       ),
+      backgroundColor: Colors.white,
       body: Column( // Wrap the list in a Column to provide multiple children
         children: [
           Align(

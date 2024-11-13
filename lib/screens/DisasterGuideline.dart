@@ -6,7 +6,9 @@ class DisasterGuideline extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('자연재해 발생시 대피요령'),
+        backgroundColor: Colors.white,
       ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0), // Add padding around the content
         child: ListView(

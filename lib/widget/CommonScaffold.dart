@@ -1,11 +1,7 @@
 // CommonScaffold.dart
 
 import 'package:flutter/material.dart';
-import 'package:aiml_mobile_2024/screens/HomeScreen.dart';
-import 'package:aiml_mobile_2024/screens/InfraLocation.dart';
-import 'package:aiml_mobile_2024/screens/ShelterLocation.dart';
-import 'package:aiml_mobile_2024/screens/FriendsLocation.dart';
-import 'package:aiml_mobile_2024/screens/ShowCustomSearchMessage.dart';
+
 
 class CommonScaffold extends StatefulWidget {
   final Widget title;
@@ -33,20 +29,15 @@ class _CommonScaffoldState extends State<CommonScaffold> {
       _selectedIndex = index;
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: widget.leading??
-            (Navigator.canPop(context)
-                ? IconButton(
-                icon: Icon(Icons.arrow_back),
-      onPressed: (){Navigator.pop(context);},
-        ) :null),
         title: widget.title,
         actions: widget.actions,
+        backgroundColor: Colors.white,
       ),
+      backgroundColor: Colors.white,
       body: IndexedStack(
         index: _selectedIndex,
         children: widget.pages,
@@ -60,7 +51,7 @@ class _CommonScaffoldState extends State<CommonScaffold> {
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
-          BottomNavigationBarItem(icon: Icon(Icons.content_paste_search), label: '게시판'),
+          BottomNavigationBarItem(icon: Icon(Icons.content_paste_search), label: '커뮤니티'),
           BottomNavigationBarItem(icon: Icon(Icons.near_me), label: '길 안내'),
           BottomNavigationBarItem(icon: Icon(Icons.youtube_searched_for), label: '친구 찾기'),
           BottomNavigationBarItem(icon: Icon(Icons.mode_comment), label: '재난 문자 목록'),
@@ -69,5 +60,3 @@ class _CommonScaffoldState extends State<CommonScaffold> {
     );
   }
 }
-
-

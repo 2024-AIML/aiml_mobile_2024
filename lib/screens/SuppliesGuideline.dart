@@ -6,7 +6,9 @@ class SuppliesguidelineScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('대피 준비물'),
+        backgroundColor: Colors.white,
       ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0), // Add padding around the content
         child: ListView(

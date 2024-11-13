@@ -6,7 +6,9 @@ class WarGuideline extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('전시 행동 요령'),
+        backgroundColor: Colors.white,
       ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(

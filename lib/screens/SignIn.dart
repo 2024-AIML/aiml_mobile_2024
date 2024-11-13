@@ -19,7 +19,7 @@ class _SignInState extends State<SignIn> {
     // String id = _idController.text; // 'id'로 변경
     // String password = _passwordController.text;
 
-    final url = Uri.parse('http://3.34.139.173:8081/api/login');
+    final url = Uri.parse('http://43.202.6.121:8081/api/login');
 
     final response = await http.post(
       url,
@@ -55,7 +55,9 @@ class _SignInState extends State<SignIn> {
     return Scaffold(
       appBar: AppBar(
         title: Text('로그인'),
+        backgroundColor: Colors.white,
       ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: EdgeInsets.all(20.0),
         child: Column(

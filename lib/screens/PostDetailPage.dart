@@ -11,7 +11,9 @@ class PostDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-      title: Text(title),), // 게시글 제목을 앱바에 표시
+      title: Text(title),
+        backgroundColor: Colors.white,),
+      backgroundColor: Colors.white,// 게시글 제목을 앱바에 표시
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Text(content), // 게시글 내용을 출력

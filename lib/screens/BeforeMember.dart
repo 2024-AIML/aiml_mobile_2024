@@ -14,8 +14,10 @@ class _BeforeMemberState extends State<BeforeMember> {
     return Scaffold(
       appBar: AppBar(  // Correctly initializing the AppBar
         title: Text('Before Member'),
-        actions: [], // Add actions if needed
+        actions: [],
+        backgroundColor: Colors.white,// Add actions if needed
       ),
+      backgroundColor: Colors.white,
       body: Align(
         alignment: Alignment(0.0, -0.6),
         child: Container(
