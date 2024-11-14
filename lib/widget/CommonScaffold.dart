@@ -32,15 +32,15 @@ class _CommonScaffoldState extends State<CommonScaffold> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: widget.title,
-        actions: widget.actions,
-        backgroundColor: Colors.white,
-      ),
       backgroundColor: Colors.white,
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: widget.pages,
+      body: SafeArea(
+        child: Container(
+          color: Colors.white, // SafeArea 내부 배경색 설정
+          child: IndexedStack(
+            index: _selectedIndex,
+            children: widget.pages,
+          ),
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,

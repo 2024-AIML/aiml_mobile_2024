@@ -244,8 +244,9 @@ class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
       }
     }
 
-    return Center(
-      child: Column(
+    return Scaffold(
+      backgroundColor: Colors.white, // 전체 배경 색 지정
+      body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (_currentPosition != null)
@@ -328,7 +329,6 @@ class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
                       print('Failed to get route URL');
                     }
                   },
-
                   child: ListTile(
                     title: Row(
                       children: [
@@ -349,7 +349,7 @@ class _ShelterLocationScreenState extends State<ShelterLocationScreen> {
                         SizedBox(width: 20),
                         Text(
                           ' ${shelter.Capacity.toInt()}',
-                          style: TextStyle(color: capacityColor,fontWeight: FontWeight.bold),
+                          style: TextStyle(color: capacityColor, fontWeight: FontWeight.bold),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],

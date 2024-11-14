@@ -14,6 +14,7 @@ import 'Guidelines.dart';
 import 'MorseCode.dart';
 import 'MyPage.dart';
 import 'InfraLocation.dart';
+import 'package:aiml_mobile_2024/service/token_storage.dart';
 
 class ShowFirstThreeMessages extends StatefulWidget {
   const ShowFirstThreeMessages({Key? key}) : super(key: key);
@@ -39,6 +40,7 @@ class _ShowFirstThreeMessagesState extends State<ShowFirstThreeMessages> {
     _pageController.dispose();
     super.dispose();
   }
+
 
   void _fetchData() async {
     List<Message> messages = await HttpService.fetchData();
@@ -118,13 +120,37 @@ class HomeScreenAfterLogin extends StatefulWidget {
 
 class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
   List<Map<String, dynamic>> posts = [];
+  String userName = '';
 
   @override
   void initState() {
   super.initState();
   fetchPosts();
+  fetchUserInfo();
 }
 
+  Future<void> fetchUserInfo() async {
+    String? jwtToken = await getJwtToken();
+    if (jwtToken != null) {
+      final response = await http.get(
+        Uri.parse('http://43.202.6.121:8081/api/member/info'),
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var userData = jsonDecode(response.body);
+        setState(() {
+          userName = userData['name'] ?? 'Unknown';
+        });
+      } else {
+        print("Failed to load user info: ${response.statusCode}");
+      }
+    } else {
+      print("JWT Token is missing");
+    }
+  }
 
   Future<void> fetchPosts() async {
     final response = await http.get(Uri.parse('http://43.202.6.121:8081/post/'));
@@ -151,7 +177,6 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
   Widget build(BuildContext context) {
     return CommonScaffold(
       title: Text(''),
-
       pages: [
         Stack(
           children: [
@@ -194,7 +219,7 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          SizedBox(height: 10),
+          SizedBox(height: 50),
             Padding(padding: EdgeInsets.symmetric(horizontal: 20.0),
            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -213,7 +238,7 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
               Row(
                 children: [
                   Text(
-                    ' 00 님!',
+                    ' $userName 님!',
                     style: TextStyle(
                       fontSize: 28.0,
                       fontWeight: FontWeight.bold,
@@ -326,14 +351,24 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
                 height: 80.0,
                 margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: Colors.green[200],
                   borderRadius: BorderRadius.circular(15.0),
                 ),
                 child: Center(
-                  child: Text(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                  Text(
                     post['title'] ?? '제목 없음',
                     style: TextStyle(color: Colors.black, fontSize: 16.0),
                   ),
+                  SizedBox(height: 5),
+                  Text(
+                    post['content'] ?? '제목 없음',
+                    style: TextStyle(color:Colors.black, fontSize: 12.0),
+                  )
+                ],
+                ),
                 ),
               );
             }).toList(),

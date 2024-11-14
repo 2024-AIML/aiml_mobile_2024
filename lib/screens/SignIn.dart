@@ -1,3 +1,4 @@
+import 'package:aiml_mobile_2024/screens/HomeScreenAfterLogin.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -40,7 +41,7 @@ class _SignInState extends State<SignIn> {
         print('Login succesful');
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context)=> MyPage()),
+          MaterialPageRoute(builder: (context)=> HomeScreenAfterLogin()),
         );
       } else {
         print('Token not found or null');
