@@ -1268,7 +1268,7 @@ SPEC CHECKSUMS:
   FirebaseSharedSwift: 0274086954b1b2d5fd7e829eccc587044d72a4ba
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_naver_map: d31b1884517151e7b3121e3b24c18733ef4e4387
-  geolocator_apple: 6cbaf322953988e009e5ecb481f07efece75c450
+  geolocator_apple: 9bcea1918ff7f0062d98345d238ae12718acfbc1
   GoogleUtilities: ea963c370a38a8069cc5f7ba4ca849a60b6d7d15
   "gRPC-C++": e725ef63c4475d7cdb7e2cf16eb0fde84bd9ee51
   gRPC-Core: eee4be35df218649fe66d721a05a7f27a28f069b

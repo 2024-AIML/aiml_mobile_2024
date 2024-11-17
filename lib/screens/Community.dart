@@ -1,16 +1,12 @@
 import 'dart:convert';
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:aiml_mobile_2024/widget/CommonScaffold.dart';
 import 'PostDetailPage.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:geolocator/geolocator.dart';
-import 'dart:convert';
 import 'package:aiml_mobile_2024/screens/WritePost.dart';
-import 'package:aiml_mobile_2024/screens/Community.dart';
 
 class Community extends StatefulWidget {
   @override
@@ -33,20 +29,35 @@ class _CommunityState extends State<Community> {
 
   List<Map<String, dynamic>> posts = [];
 
+
+
+
   @override
   void initState() {
     super.initState();
-    _fetchMapData();
     _getCurrentLocation();
     fetchPosts(); // API 호출
   }
 
+  Future<void> _getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      setState(() {
+        _currentPosition = position;
+      });
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
   // Post 데이터를 가져오는 함수
   Future<void> fetchPosts() async {
-    final response = await http.get(Uri.parse('http://13.209.84.51:8081/post/'));
+    try{
+    final response = await http.get(Uri.parse('http://3.34.139.173:8081/post/'));
 
     if (response.statusCode == 200) {
-      List<dynamic> data = jsonDecode(response.body);
+      List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
 
       // 데이터를 Map 형식으로 변환 후 posts 리스트에 저장
       setState(() {
@@ -60,7 +71,12 @@ class _CommunityState extends State<Community> {
     } else {
       throw Exception('Failed to load posts');
     }
-  }
+  } catch (e) {setState(() {
+    posts = [{'title': '저 홍대 4공학관인데 살려주세요', 'content': '여기에 사람이 8명이나 있는데 이 글 보신다면 찾으러 와주세요'},
+      {'title': '내 눈앞에 미사일 날라감 ㅋㅋ', 'content': '이거 실제 상황임?'},
+      {'title': '이 상황에서 어떻게 살아남냐고?', 'content': '요즘 같은 난리통에 다들 멘붕인거 알겠는데, 어쨋든 살아남아야 하지 않겠냐? 내가 몇 가지 생존 팁 좀 풀어 본다. 뭐 기본적으로 물이랑 먹을 거 챙겨두는 거 필수고, 어디 안전하게 숨을 곳 있는지 미리 알아둬라. 그리고 막 나가지 말고 눈치껏 상황 파악 잘 하면서 살아남자고. 다들 자신만의 팁 있으면 공유하자. 여기서라도 살아남아야지.'},
+      {'title': '아 배고프다', 'content': '우리집 통조림 다 떨어졌는데 통조림 나눔 좀 해주세요'},];
+  });}}
 
   void navigateToContent(String title, String content) {
     Navigator.push(
@@ -71,61 +87,10 @@ class _CommunityState extends State<Community> {
     );
   }
 
-  Future<void> _fetchMapData() async {
-    final String clientId = 'vbuyb9r3k9';
-    final String clientSecret = 'BfVUIMtidWxbl2oknXpImwn8hbjcphnWHSr6LPty';
-    final String apiUrl = 'https://naveropenapi.apigw.ntruss.com/map-static/v2/raster?w=1170&h=1170&center=127.1054221,37.3591614&level=16';
-
-    final headers = {
-      'X-NCP-APIGW-API-KEY-ID': clientId,
-      'X-NCP-APIGW-API-KEY': clientSecret,
-    };
-
-    try {
-      final response = await http.get(Uri.parse(apiUrl), headers: headers);
-
-      if (response.statusCode == 200) {
-        final imageBytes = response.bodyBytes;
-        final image = Image.memory(imageBytes);
-        setState(() {
-          mapImage = image;
-        });
-      } else {
-        throw Exception('Failed to fetch map data');
-      }
-    } catch (e) {
-      print('Error fetching map data: $e');
-    }
-  }
-
-  Future<void> _getCurrentLocation() async {
-    try {
-      LocationPermission permission = await Geolocator.requestPermission();
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      setState(() {
-        _currentPosition = position;
-      });
-      if (_controller != null) {
-        _controller!.updateCamera(
-          NCameraUpdate.scrollAndZoomTo(
-            target: NLatLng(
-              _currentPosition!.latitude,
-              _currentPosition!.longitude,
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      print("Error: $e");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       backgroundColor: Colors.white,
+      backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -177,7 +142,7 @@ class _CommunityState extends State<Community> {
                             color: Colors.white,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15.0),
-                                side: BorderSide(color:Colors.black,width:2.0,)
+                                side: BorderSide(color:Colors.green[900]!,width:2.0,)
                             ),
                             elevation: 5,
                             margin: EdgeInsets.symmetric(vertical: 10.0),
@@ -189,17 +154,21 @@ class _CommunityState extends State<Community> {
                                   Text(
                                     post['title']!,
                                     style: TextStyle(
-                                      fontSize: 18.0,
+                                      fontSize: 16.0,
                                       fontWeight: FontWeight.bold,
                                     ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  SizedBox(height: 10),
+                                  SizedBox(height: 5.0),
                                   Text(
                                     post['content']!,
                                     style: TextStyle(
                                       fontSize: 14.0,
                                       color: Colors.grey[700],
                                     ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),

@@ -54,7 +54,7 @@ class _ShowFirstThreeMessagesState extends State<ShowFirstThreeMessages> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
       decoration: BoxDecoration(
-        color: Colors.green[100],
+        color: Colors.red[100],
         borderRadius: BorderRadius.circular(10.0),
       ),
       height: 130, // 메시지 박스 높이 조정
@@ -121,6 +121,7 @@ class HomeScreenAfterLogin extends StatefulWidget {
 class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
   List<Map<String, dynamic>> posts = [];
   String userName = '';
+  final List<Color> cardColors = [Colors.blue[50]!, Colors.green[50]!, Colors.pink[50]!];
 
   @override
   void initState() {
@@ -153,24 +154,30 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
   }
 
   Future<void> fetchPosts() async {
-    final response = await http.get(Uri.parse('http://43.202.6.121:8081/post/'));
+    try{
+      final response = await http.get(Uri.parse('http://3.34.139.173:8081/post/'));
 
-    if (response.statusCode == 200) {
-      List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
 
-      // 데이터를 Map 형식으로 변환 후 posts 리스트에 저장
-      setState(() {
-        posts = data.map((post) {
-          return {
-            'title': post['title'],
-            'content': post['content'],
-          };
-        }).toList();
-      });
-    } else {
-      throw Exception('Failed to load posts');
-    }
-  }
+        // 데이터를 Map 형식으로 변환 후 posts 리스트에 저장
+        setState(() {
+          posts = data.map((post) {
+            return {
+              'title': post['title'],
+              'content': post['content'],
+            };
+          }).toList();
+        });
+      } else {
+        throw Exception('Failed to load posts');
+      }
+    } catch (e) {setState(() {
+      posts = [{'title': '저 홍대 4공학관인데 살려주세요', 'content': '여기에 사람이 8명이나 있는데 이 글 보신다면 찾으러 와주세요'},
+        {'title': '내 눈앞에 미사일 날라감 ㅋㅋ', 'content': '이거 실제 상황임?'},
+        {'title': '이 상황에서 어떻게 살아남냐고?', 'content': '요즘 같은 난리통에 다들 멘붕인거 알겠는데, 어쨋든 살아남아야 하지 않겠냐? 내가 몇 가지 생존 팁 좀 풀어 본다. 뭐 기본적으로 물이랑 먹을 거 챙겨두는 거 필수고, 어디 안전하게 숨을 곳 있는지 미리 알아둬라. 그리고 막 나가지 말고 눈치껏 상황 파악 잘 하면서 살아남자고. 다들 자신만의 팁 있으면 공유하자. 여기서라도 살아남아야지.'},
+        {'title': '아 배고프다', 'content': '우리집 통조림 다 떨어졌는데 통조림 나눔 좀 해주세요'},];
+    });}}
 
 
   @override
@@ -246,7 +253,7 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
                   ),
                 ],
               ),
-              SizedBox(height: 60),
+              SizedBox(height: 40),
             ],
           ),
             ),
@@ -259,7 +266,7 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
             child: Container(
               padding: EdgeInsets.all(20.0),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(10.0),
                 boxShadow: [
                   BoxShadow(
@@ -280,7 +287,7 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
                       Text(
                         '재난알림',
                         style: TextStyle(
-                            fontSize: 18.0, fontWeight: FontWeight.normal),
+                            fontSize: 18.0, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -294,7 +301,7 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
             ),
           ),
 
-          SizedBox(height: 30.0),
+          SizedBox(height: 50.0),
 
           // Nearby Places Section
           const Row(
@@ -306,12 +313,12 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
                   TextSpan(
                     text: '지금 ',
                     style: TextStyle(
-                        fontSize: 16.0, fontWeight: FontWeight.normal),
+                        fontSize: 18.0, fontWeight: FontWeight.normal),
                     children: [
                       TextSpan(
                         text: '내 주변은',
                         style: TextStyle(
-                            fontSize: 16.0, fontWeight: FontWeight.bold),
+                            fontSize: 18.0, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -328,7 +335,7 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
             ),
           ),
 
-          SizedBox(height: 30),
+          SizedBox(height: 50),
 
           // Community Board Section
           Row(
@@ -339,43 +346,85 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
                 child: Text(
                   '우리 동네 게시판',
                   style: TextStyle(
-                      fontSize: 20.0, fontWeight: FontWeight.normal),
+                      fontSize: 18.0, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
           ),
-          posts.isNotEmpty
-              ? Column(
-            children: posts.take(3).map((post) {
-              return Container(
-                height: 80.0,
-                margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
-                decoration: BoxDecoration(
-                  color: Colors.green[200],
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                  Text(
-                    post['title'] ?? '제목 없음',
-                    style: TextStyle(color: Colors.black, fontSize: 16.0),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    post['content'] ?? '제목 없음',
-                    style: TextStyle(color:Colors.black, fontSize: 12.0),
-                  )
-                ],
-                ),
-                ),
-              );
-            }).toList(),
-          )
-              : Center(child: CircularProgressIndicator()),
+          SizedBox(height: 20),
 
-          SizedBox(height: 30.0),
+
+    posts.isNotEmpty
+    ? Column(
+    children: posts.take(3).map((post) {
+      final int index = posts.indexOf(post);
+      final Color cardColor = cardColors[index % cardColors.length];
+      return Container(
+        margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 왼쪽 아이콘
+            Container(
+              margin: EdgeInsets.only(right: 10.0),
+              padding: EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.person,
+                color: Colors.black,
+                size: 24,
+              ),
+            ),
+            // 카드 본체
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(10.0),
+                  border: Border.all(color: Colors.grey[400]!, width: 1.5),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        post['title'] ?? 'No Title',
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                      SizedBox(height: 5.0),
+                      Text(
+                        post['content'] ?? 'No Content',
+                        style: TextStyle(
+                          fontSize: 13.0,
+                          color: Colors.grey[700],
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }).toList(),
+    )
+        : Center(child: CircularProgressIndicator()),
+
+
+
+    SizedBox(height: 10.0),
         ],
       ),
     );

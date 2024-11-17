@@ -9,15 +9,13 @@ class AddFriend extends StatelessWidget {
   Future<List<DocumentSnapshot>> searchUsers(String searchQuery) async {
     List<DocumentSnapshot> users = [];
 
-    // Firebase의 user 컬렉션에서 모든 문서 가져오기
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('user').get();
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('USER_INFO').get();
 
     // 모든 문서에서 검색어와 일치하는 사용자를 찾기
     for (var document in querySnapshot.docs) {
       Map<String, dynamic> data = document.data() as Map<String, dynamic>;
 
-      // 전화번호, 이름, 이메일 필드가 존재하는지 확인하고 일치하는지 검사
-      if ((data.containsKey('phone') && data['phone'].toString().contains(searchQuery)) ||
+      if ((data.containsKey('phoneNum') && data['phoneNum'].toString().contains(searchQuery)) ||
           (data.containsKey('name') && data['name'].toString().contains(searchQuery)) ||
           (data.containsKey('email') && data['email'].toString().contains(searchQuery))) {
         users.add(document);
@@ -55,7 +53,7 @@ class AddFriend extends StatelessWidget {
   Future<void> sendFriendRequest(BuildContext context, String currentUserId, String friendUserId) async {
     try {
       // 친구의 document 참조
-      DocumentReference friendDocRef = FirebaseFirestore.instance.collection('user').doc(friendUserId);
+      DocumentReference friendDocRef = FirebaseFirestore.instance.collection('USER_INFO').doc(friendUserId);
 
       // 친구의 notification 서브 컬렉션 참조
       CollectionReference notificationRef = friendDocRef.collection('notification');
@@ -71,14 +69,15 @@ class AddFriend extends StatelessWidget {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('친구 요청 성공'),
+          backgroundColor: Colors.white,
+          title: Text('친구 요청 성공', style: TextStyle(color: Colors.black),),
           content: Text('친구 요청을 성공적으로 보냈습니다.'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // 대화 상자 닫기
               },
-              child: Text('확인'),
+              child: Text('확인', style: TextStyle(color: Colors.black)),
             ),
           ],
         ),
@@ -89,8 +88,6 @@ class AddFriend extends StatelessWidget {
       print('친구 요청을 보내는 도중 오류가 발생했습니다: $e');
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -131,14 +128,15 @@ class AddFriend extends StatelessWidget {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text('검색 결과'),
-                      content: Text('일치하는 사용자가 없습니다.'),
+                      backgroundColor: Colors.white,
+                      title: Text('검색 결과', style: TextStyle(color: Colors.black)),
+                      content: Text('일치하는 사용자가 없습니다.', style: TextStyle(color: Colors.black)),
                       actions: [
                         TextButton(
                           onPressed: () {
                             Navigator.of(context).pop(); // 대화상자 닫기
                           },
-                          child: Text('확인'),
+                          child: Text('확인', style: TextStyle(color: Colors.black)),
                         ),
                       ],
                     ),
@@ -148,32 +146,61 @@ class AddFriend extends StatelessWidget {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text('검색 결과'),
+                      backgroundColor: Colors.white,
+                      title: Text('검색 결과', style: TextStyle(color: Colors.black, fontSize: 18)),
                       content: Container(
+                        color: Colors.white,
                         width: double.maxFinite,
                         height: 300,
                         child: ListView.builder(
                           itemCount: foundUsers.length,
                           itemBuilder: (context, index) {
                             Map<String, dynamic> userData = foundUsers[index].data() as Map<String, dynamic>;
-                            String friendUserId = foundUsers[index].id; // 친구의 문서 아이디
+                            String friendUserId = foundUsers[index].id;
                             return Card(
-                              child: ListTile(
-                                title: Text('Name: ${userData['name']}'),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Phone: ${maskPhoneNumber(userData['phone'] ?? '')}'),
-                                    Text('Email: ${maskEmail(userData['email'] ?? '')}'),
-                                  ],
+                              elevation: 0,
+                              color: Colors.white,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.black,
+                                    width: 0.5,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                trailing: ElevatedButton(
-                                  onPressed: () async {
-                                    String currentUserId = '1234_hello'; // 현재 사용자 ID, 실제로는 적절한 ID로 바꿔 사용해야 함
-                                    await sendFriendRequest(context, currentUserId, friendUserId);
-                                    print('친구 요청을 보냈습니다: ${userData['name']}');
-                                  },
-                                  child: Text('친구 신청'),
+                                child: ListTile(
+                                  tileColor: Colors.white,
+                                  title: Text(
+                                    '이름: ${userData['name']}',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '전화번호: ${maskPhoneNumber(userData['phoneNum'] ?? '')}',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                      Text(
+                                        '이메일: ${maskEmail(userData['email'] ?? '')}',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: ElevatedButton(
+                                    onPressed: () async {
+                                      String currentUserId = '1234_hello'; // 현재 사용자 ID, 실제로는 적절한 ID로 바꿔 사용해야 함
+                                      await sendFriendRequest(context, currentUserId, friendUserId);
+                                      print('친구 요청을 보냈습니다: ${userData['name']}');
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.black,
+                                    ),
+                                    child: Text(
+                                      '친구 신청',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
                                 ),
                               ),
                             );
@@ -189,23 +216,22 @@ class AddFriend extends StatelessWidget {
               ),
               child: Text(
                 '검색',
-                style: TextStyle(
-                  color: Colors.white,
+                style: TextStyle(color: Colors.white,
                 ),),
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => NotificationsPage(senderUserId: '',)),
-          );
-        },
-        child: Icon(Icons.notifications, color: Colors.white,),
-        tooltip: 'Notifications',
-        backgroundColor: Colors.black
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => NotificationsPage(senderUserId: '',)),
+            );
+          },
+          child: Icon(Icons.notifications, color: Colors.white,),
+          tooltip: 'Notifications',
+          backgroundColor: Colors.black
       ),
     );
   }
