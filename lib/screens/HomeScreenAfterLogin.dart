@@ -54,7 +54,7 @@ class _ShowFirstThreeMessagesState extends State<ShowFirstThreeMessages> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
       decoration: BoxDecoration(
-        color: Colors.red[100],
+        color: Colors.green[100],
         borderRadius: BorderRadius.circular(10.0),
       ),
       height: 130, // 메시지 박스 높이 조정

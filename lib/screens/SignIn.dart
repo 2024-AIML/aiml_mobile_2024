@@ -104,7 +104,7 @@ class _SignInState extends State<SignIn> {
             ),
             TextButton(
                 onPressed: (){
-                  Navigator.push(
+                  Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => JoinMember())
                   );

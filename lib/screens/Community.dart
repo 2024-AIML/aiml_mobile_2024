@@ -65,6 +65,8 @@ class _CommunityState extends State<Community> {
           return {
             'title': post['title'],
             'content': post['content'],
+            'latitude': post['latitude'],
+            'longitude': post['longitude'],
           };
         }).toList();
       });
@@ -85,6 +87,27 @@ class _CommunityState extends State<Community> {
           builder: (context) => PostDetailPage(title: title, content: content),
         )
     );
+  }
+
+  void _addMarker(double latitude, double longitude, String title) {
+    final marker = NMarker(
+      id: 'marker_${latitude}_${longitude}',
+      position: NLatLng(latitude, longitude),
+    );
+
+    setState(() {
+      markers.add(marker);
+    });
+
+    marker.setOnTapListener((overlay) {
+      print('Marker tapped: $title');
+    });
+
+    setState(() {
+      markers.add(marker);
+    });
+
+    _controller?.addOverlay(marker);
   }
 
   @override
@@ -109,95 +132,108 @@ class _CommunityState extends State<Community> {
                 onMapReady: (controller) {
                   setState(() {
                     _controller = controller;
+
+                    for(var marker in markers) {
+                      controller.addOverlay(marker);
+                    }
                   });
                 },
               ),
             ),
           Expanded(
-              child: Stack(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: posts.isEmpty
-                        ? Center(child: CircularProgressIndicator())
-                        : ListView.builder(
-                      itemCount: posts.length,
-                      itemBuilder: (context, index) {
-                        final post = posts[index];
-                        return InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:(context)=>PostDetailPage(
-                                  title: post['title'] ?? 'No Title',
-                                  content: post['content']?? 'No Content',
-                                ),
-                              ),
-                            );
-                          },
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: posts.isEmpty
+                      ? Center(child: CircularProgressIndicator())
+                      : ListView.separated(
+                    itemCount: posts.length,
+                    separatorBuilder: (context, index) => Divider(
+                      color: Colors.white, // 리스트 아이템 간 구분선
+                      height: 10.0,
+                      thickness: 1,
+                    ),
+                    itemBuilder: (context, index) {
+                      final post = posts[index];
+                      final String title = post['title'] ?? '제목 없음';
+                      final String content = post['content'] ?? '내용 없음';
 
 
-                          child: Card(
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                                side: BorderSide(color:Colors.green[900]!,width:2.0,)
-                            ),
-                            elevation: 5,
-                            margin: EdgeInsets.symmetric(vertical: 10.0),
-                            child: Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    post['title']!,
-                                    style: TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(height: 5.0),
-                                  Text(
-                                    post['content']!,
-                                    style: TextStyle(
-                                      fontSize: 14.0,
-                                      color: Colors.grey[700],
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PostDetailPage(
+                                title: title,
+                                content: content,
                               ),
                             ),
-
+                          );
+                        },
+                        child: ListTile(
+                          tileColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            side: BorderSide(color: Colors.green[900]!, width: 1.5),
                           ),
-                        );
-                      },
-                    ),
-                  ),
 
-                  Positioned(
-                    bottom: 10.0,
-                    right: 10.0,
-                    child: IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => WritePost()),
-                        );
-                      },
-                      icon: Icon(Icons.add_circle),
-                      iconSize: 90.0,
-                      color: Colors.grey[300],// Increase the size of the icon
-                    ),
+                          title: Text(
+                            title,
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 5),
+                              Text(
+                                content,
+                                style: TextStyle(
+                                  fontSize: 14.0,
+                                  color: Colors.grey[700],
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                          trailing: Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.green[900],
+                            size: 16.0,
+                          ),
+                          contentPadding: EdgeInsets.all(12.0),
+                        ),
+                      );
+                    },
                   ),
-                ], //children
-              )
+                ),
+                Positioned(
+                  bottom: 10.0,
+                  right: 10.0,
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => WritePost()),
+                      );
+                    },
+                    icon: Icon(Icons.add_circle),
+                    iconSize: 70.0,
+                    color: Colors.green[900], // 버튼 색상
+                  ),
+                ),
+              ],
+            ),
           )
+
         ], //children
       ),
     );
