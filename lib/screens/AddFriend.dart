@@ -1,17 +1,59 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:aiml_mobile_2024/service/token_storage.dart';
+import 'package:http/http.dart' as http;
 
 import 'FriendsNotification.dart';
 
-class AddFriend extends StatelessWidget {
+class AddFriend extends StatefulWidget {
+  @override
+  _AddFriendState createState() => _AddFriendState();
+}
+
+class _AddFriendState extends State<AddFriend> {
   final TextEditingController _controller = TextEditingController();
+  String userId = 'Unknown';
+  String userName = 'Unknown';
+  String userPhone = 'No phone';
+
+  Future<void> fetchUserInfo() async {
+    String? jwtToken = await getJwtToken();
+
+    if (jwtToken != null) {
+      final response = await http.get(
+        Uri.parse('http://3.38.101.112:8081/api/member/info'),
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var userData = jsonDecode(response.body);
+        setState(() {
+          userId = userData['id'] ?? 'Unknown';
+          userName = userData['name'] ?? 'Unknown'; // name이 null이면 'Unknown'
+          userPhone = userData['phoneNum'] ?? 'No phone';
+        });
+      } else {
+        print("Failed to load user info: ${response.statusCode}, ${response.body}");
+      }
+    } else {
+      print("JWT Token is missing");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserInfo(); // 화면이 로드될 때 사용자 정보 가져오기
+  }
 
   Future<List<DocumentSnapshot>> searchUsers(String searchQuery) async {
     List<DocumentSnapshot> users = [];
 
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('USER_INFO').get();
 
-    // 모든 문서에서 검색어와 일치하는 사용자를 찾기
     for (var document in querySnapshot.docs) {
       Map<String, dynamic> data = document.data() as Map<String, dynamic>;
 
@@ -49,33 +91,27 @@ class AddFriend extends StatelessWidget {
     return '$username@$domain';
   }
 
-
   Future<void> sendFriendRequest(BuildContext context, String currentUserId, String friendUserId) async {
     try {
-      // 친구의 document 참조
       DocumentReference friendDocRef = FirebaseFirestore.instance.collection('USER_INFO').doc(friendUserId);
-
-      // 친구의 notification 서브 컬렉션 참조
       CollectionReference notificationRef = friendDocRef.collection('notification');
 
-      // 새로운 알림 문서 생성
       await notificationRef.add({
-        'senderId': currentUserId, // 친구 요청을 보낸 사용자 ID
-        'timestamp': FieldValue.serverTimestamp(), // 친구 요청 보낸 시간
-        'type': 'friend_request' // 알림의 종류 (친구 요청)
+        'senderId': currentUserId,
+        'timestamp': FieldValue.serverTimestamp(),
+        'type': 'friend_request'
       });
 
-      // 성공적으로 친구 요청을 보낸 후, 알림 창 표시
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: Colors.white,
-          title: Text('친구 요청 성공', style: TextStyle(color: Colors.black),),
+          title: Text('친구 요청 성공', style: TextStyle(color: Colors.black)),
           content: Text('친구 요청을 성공적으로 보냈습니다.'),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // 대화 상자 닫기
+                Navigator.of(context).pop();
               },
               child: Text('확인', style: TextStyle(color: Colors.black)),
             ),
@@ -104,13 +140,11 @@ class AddFriend extends StatelessWidget {
             TextField(
               controller: _controller,
               decoration: InputDecoration(
-                  labelText: '추가하고 싶은 사람의 정보를 입력하세요.',
-                  labelStyle: TextStyle(
-                    color: Colors.black, // Set the label color to green
-                  ),
-                  hintText: '상대방의 전화번호, 이름, 이메일 중 하나를 입력하세요',
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color:Colors.green[900]!,))
+                labelText: '추가하고 싶은 사람의 정보를 입력하세요.',
+                labelStyle: TextStyle(color: Colors.black),
+                hintText: '상대방의 전화번호, 이름, 이메일 중 하나를 입력하세요',
+                focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green[900]!)),
               ),
             ),
             SizedBox(height: 20),
@@ -119,11 +153,9 @@ class AddFriend extends StatelessWidget {
                 String searchQuery = _controller.text;
                 print('Search Query: $searchQuery');
 
-                // 사용자 검색
                 List<DocumentSnapshot> foundUsers = await searchUsers(searchQuery);
                 print('Found Users: ${foundUsers.length}');
 
-                // 검색 결과에 따른 처리
                 if (foundUsers.isEmpty) {
                   showDialog(
                     context: context,
@@ -134,7 +166,7 @@ class AddFriend extends StatelessWidget {
                       actions: [
                         TextButton(
                           onPressed: () {
-                            Navigator.of(context).pop(); // 대화상자 닫기
+                            Navigator.of(context).pop();
                           },
                           child: Text('확인', style: TextStyle(color: Colors.black)),
                         ),
@@ -142,7 +174,6 @@ class AddFriend extends StatelessWidget {
                     ),
                   );
                 } else {
-                  // 검색된 사용자를 화면에 표시
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
@@ -169,7 +200,6 @@ class AddFriend extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: ListTile(
-                                  tileColor: Colors.white,
                                   title: Text(
                                     '이름: ${userData['name']}',
                                     style: TextStyle(color: Colors.black),
@@ -189,7 +219,7 @@ class AddFriend extends StatelessWidget {
                                   ),
                                   trailing: ElevatedButton(
                                     onPressed: () async {
-                                      String currentUserId = '1234_hello'; // 현재 사용자 ID, 실제로는 적절한 ID로 바꿔 사용해야 함
+                                      String currentUserId = userId; // 현재 사용자 ID
                                       await sendFriendRequest(context, currentUserId, friendUserId);
                                       print('친구 요청을 보냈습니다: ${userData['name']}');
                                     },
@@ -216,22 +246,22 @@ class AddFriend extends StatelessWidget {
               ),
               child: Text(
                 '검색',
-                style: TextStyle(color: Colors.white,
-                ),),
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => NotificationsPage(senderUserId: '',)),
-            );
-          },
-          child: Icon(Icons.notifications, color: Colors.white,),
-          tooltip: 'Notifications',
-          backgroundColor: Colors.black
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => NotificationsPage(senderUserId: '')),
+          );
+        },
+        child: Icon(Icons.notifications, color: Colors.white),
+        tooltip: 'Notifications',
+        backgroundColor: Colors.black,
       ),
     );
   }

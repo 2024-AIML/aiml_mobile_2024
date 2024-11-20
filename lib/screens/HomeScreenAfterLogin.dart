@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:aiml_mobile_2024/screens/MyPage.dart';
 import 'package:aiml_mobile_2024/screens/Community.dart';
 import 'package:aiml_mobile_2024/screens/FriendsLocation.dart';
 import 'package:aiml_mobile_2024/screens/ShelterLocation.dart';
@@ -128,13 +129,14 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
   super.initState();
   fetchPosts();
   fetchUserInfo();
+
 }
 
   Future<void> fetchUserInfo() async {
     String? jwtToken = await getJwtToken();
     if (jwtToken != null) {
       final response = await http.get(
-        Uri.parse('http://43.202.6.121:8081/api/member/info'),
+        Uri.parse('http://3.38.101.112:8081/api/member/info'),
         headers: {
           'Authorization': 'Bearer $jwtToken',
         },
@@ -155,7 +157,7 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
 
   Future<void> fetchPosts() async {
     try{
-      final response = await http.get(Uri.parse('http://3.34.139.173:8081/post/'));
+      final response = await http.get(Uri.parse('http://3.38.101.112 :8081/post/'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -179,8 +181,46 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
         {'title': '아 배고프다', 'content': '우리집 통조림 다 떨어졌는데 통조림 나눔 좀 해주세요'},];
     });}}
 
+  Future<void> logout(BuildContext context) async {
+    String? jwtToken = await getJwtToken(); // Get JWT token
 
-  @override
+    if (jwtToken != null) {
+      try {
+        final response = await http.post(
+          Uri.parse('http://3.38.101.112:8081/logout'),
+          headers: {
+            'Authorization': 'Bearer $jwtToken',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          // Remove JWT token on successful logout
+          await removeJwtToken();
+
+          // Navigate to HomeScreen
+          Navigator.pushReplacementNamed(context, '/HomeScreen');
+        } else if (response.statusCode == 302) {
+          var redirectUrl = response.headers['location'];
+          if (redirectUrl != null) {
+            print("Redirecting to: $redirectUrl");
+            Navigator.pushReplacementNamed(context, '/HomeScreen');
+          }
+        } else {
+          print("Failed to logout: ${response.statusCode}, ${response.body}");
+        }
+      } catch (e) {
+        print("Error during logout: $e");
+      }
+    } else {
+      print("JWT Token is missing");
+      Navigator.pushReplacementNamed(context, '/HomeScreen');
+    }}
+
+
+
+
+
+    @override
   Widget build(BuildContext context) {
     return CommonScaffold(
       title: Text(''),
@@ -432,6 +472,8 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
 }
 
 void _showOptionsModal(BuildContext context) {
+  final parentState = context.findAncestorStateOfType<_HomeScreenAfterLoginState>();
+
   showModalBottomSheet(
     context: context,
     builder: (BuildContext context) {
@@ -482,6 +524,12 @@ void _showOptionsModal(BuildContext context) {
               title: const Text('로그아웃'),
               onTap: () {
                 Navigator.pop(context);
+                if (parentState != null) {
+                  parentState.logout(context); // Call the parent's logout method
+                } else {
+                  print("Failed to find parent state for logout.");
+                }
+
                 // Implement logout functionality here
               },
             )

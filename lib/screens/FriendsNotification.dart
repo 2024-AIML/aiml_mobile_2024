@@ -1,13 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:aiml_mobile_2024/service/token_storage.dart';
 import '../service/FriendService.dart';
 
-class NotificationsPage extends StatelessWidget {
-  final String currentUserId = 'user01'; // 현재 로그인한 사용자 ID 라서 나중에 바꿔야함
+class NotificationsPage extends StatefulWidget {
   final String senderUserId;
 
   NotificationsPage({required this.senderUserId});
+
+  @override
+  _NotificationsPageState createState() => _NotificationsPageState();
+}
+
+class _NotificationsPageState extends State<NotificationsPage> {
+  String currentUserId = 'Unknown'; // 현재 로그인한 사용자 ID
+  String userName = 'Unknown';
+  String userPhone = 'No phone';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserInfo();
+  }
+
+  Future<void> fetchUserInfo() async {
+    String? jwtToken = await getJwtToken();
+
+    if (jwtToken != null) {
+      final response = await http.get(
+        Uri.parse('http://3.38.101.112:8081/api/member/info'),
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var userData = jsonDecode(response.body);
+        setState(() {
+          currentUserId = userData['id'] ?? 'Unknown';
+          userName = userData['name'] ?? 'Unknown';
+          // userPhone = userData['phoneNum'] ?? 'No phone';
+        });
+      } else {
+        print("Failed to load user info: ${response.statusCode}, ${response.body}");
+      }
+    } else {
+      print("JWT Token is missing");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,12 +61,11 @@ class NotificationsPage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
-            .collection('user')
+            .collection('USER_INFO')
             .doc(currentUserId)
             .collection('notifications')
             .doc('unchecked')
             .snapshots(),
-
         builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -39,28 +80,21 @@ class NotificationsPage extends StatelessWidget {
 
           List<String> userIDs = uncheckedData.keys.toList();
 
-          // 필드 내용 출력
-          print('Notifications:');
-          uncheckedData.forEach((key, value) {
-            print('$key: $value');
-          });
-
           return ListView.builder(
             itemCount: userIDs.length,
             itemBuilder: (context, index) {
               String userID = userIDs[index];
               return FutureBuilder(
-                future: FirebaseFirestore.instance.collection('user').get(),
+                future: FirebaseFirestore.instance.collection('USER_INFO').get(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> usersSnapshot) {
                   if (usersSnapshot.connectionState == ConnectionState.waiting) {
-                    return SizedBox(); // 데이터 로딩 중에는 아무 것도 표시하지 않음
+                    return SizedBox();
                   }
                   if (!usersSnapshot.hasData || usersSnapshot.data!.docs.isEmpty) {
-                    return SizedBox(); // 사용자 데이터가 없으면 아무 것도 표시하지 않음
+                    return SizedBox();
                   }
 
                   String userName = '사용자 이름 없음';
-                  // 사용자 컬렉션에서 userID와 일치하는 문서를 찾아서 해당 문서의 name 필드 값을 가져옴
                   for (QueryDocumentSnapshot userDoc in usersSnapshot.data!.docs) {
                     if (userDoc.id == userID) {
                       userName = userDoc.get('name') ?? '사용자 이름 없음';
@@ -68,23 +102,9 @@ class NotificationsPage extends StatelessWidget {
                     }
                   }
 
-                  // // 필드 내용과 일치하는 문서가 있는지 확인하는 과정 출력
-                  // print('Checking for user $userID in user collection:');
-                  // bool foundUser = false;
-                  // for (QueryDocumentSnapshot userDoc in usersSnapshot.data!.docs) {
-                  //   if (userDoc.id == userID) {
-                  //     print('User $userID found in user collection');
-                  //     foundUser = true;
-                  //     break;
-                  //   }
-                  // }
-                  // if (!foundUser) {
-                  //   print('User $userID not found in user collection');
-                  // }
-
                   return Card(
                     child: ListTile(
-                      title: Text('User Name: $userName'),
+                      title: Text('친구 이름: $userName'),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -95,7 +115,7 @@ class NotificationsPage extends StatelessWidget {
                             },
                             child: Text('친구 수락'),
                           ),
-                          SizedBox(width: 8), // 버튼 사이의 간격
+                          SizedBox(width: 8),
                           ElevatedButton(
                             onPressed: () async {
                               FriendService friendService = FriendService();
@@ -106,7 +126,6 @@ class NotificationsPage extends StatelessWidget {
                         ],
                       ),
                       onTap: () {
-                        // 해당 사용자의 프로필 페이지로 이동하거나 필요한 작업을 수행할 수 있습니다.
                       },
                     ),
                   );
