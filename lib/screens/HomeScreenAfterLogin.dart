@@ -16,6 +16,9 @@ import 'MorseCode.dart';
 import 'MyPage.dart';
 import 'InfraLocation.dart';
 import 'package:aiml_mobile_2024/service/token_storage.dart';
+import 'package:aiml_mobile_2024/service/LogOut.dart';
+
+
 
 class ShowFirstThreeMessages extends StatefulWidget {
   const ShowFirstThreeMessages({Key? key}) : super(key: key);
@@ -136,7 +139,7 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
     String? jwtToken = await getJwtToken();
     if (jwtToken != null) {
       final response = await http.get(
-        Uri.parse('http://3.38.101.112:8081/api/member/info'),
+        Uri.parse('http://54.180.158.5:8081/api/member/info'),
         headers: {
           'Authorization': 'Bearer $jwtToken',
         },
@@ -157,7 +160,7 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
 
   Future<void> fetchPosts() async {
     try{
-      final response = await http.get(Uri.parse('http://3.38.101.112 :8081/post/'));
+      final response = await http.get(Uri.parse('http://54.180.158.5:8081/post/'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -180,44 +183,6 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
         {'title': '이 상황에서 어떻게 살아남냐고?', 'content': '요즘 같은 난리통에 다들 멘붕인거 알겠는데, 어쨋든 살아남아야 하지 않겠냐? 내가 몇 가지 생존 팁 좀 풀어 본다. 뭐 기본적으로 물이랑 먹을 거 챙겨두는 거 필수고, 어디 안전하게 숨을 곳 있는지 미리 알아둬라. 그리고 막 나가지 말고 눈치껏 상황 파악 잘 하면서 살아남자고. 다들 자신만의 팁 있으면 공유하자. 여기서라도 살아남아야지.'},
         {'title': '아 배고프다', 'content': '우리집 통조림 다 떨어졌는데 통조림 나눔 좀 해주세요'},];
     });}}
-
-  Future<void> logout(BuildContext context) async {
-    String? jwtToken = await getJwtToken(); // Get JWT token
-
-    if (jwtToken != null) {
-      try {
-        final response = await http.post(
-          Uri.parse('http://3.38.101.112:8081/logout'),
-          headers: {
-            'Authorization': 'Bearer $jwtToken',
-          },
-        );
-
-        if (response.statusCode == 200) {
-          // Remove JWT token on successful logout
-          await removeJwtToken();
-
-          // Navigate to HomeScreen
-          Navigator.pushReplacementNamed(context, '/HomeScreen');
-        } else if (response.statusCode == 302) {
-          var redirectUrl = response.headers['location'];
-          if (redirectUrl != null) {
-            print("Redirecting to: $redirectUrl");
-            Navigator.pushReplacementNamed(context, '/HomeScreen');
-          }
-        } else {
-          print("Failed to logout: ${response.statusCode}, ${response.body}");
-        }
-      } catch (e) {
-        print("Error during logout: $e");
-      }
-    } else {
-      print("JWT Token is missing");
-      Navigator.pushReplacementNamed(context, '/HomeScreen');
-    }}
-
-
-
 
 
     @override
@@ -472,7 +437,6 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
 }
 
 void _showOptionsModal(BuildContext context) {
-  final parentState = context.findAncestorStateOfType<_HomeScreenAfterLoginState>();
 
   showModalBottomSheet(
     context: context,
@@ -513,7 +477,7 @@ void _showOptionsModal(BuildContext context) {
                   context,
                   MaterialPageRoute(
                     builder: (context) => NotificationsPage(
-                      senderUserId: '',
+                      currentUserId: '',
                     ),
                   ),
                 );
@@ -524,12 +488,7 @@ void _showOptionsModal(BuildContext context) {
               title: const Text('로그아웃'),
               onTap: () {
                 Navigator.pop(context);
-                if (parentState != null) {
-                  parentState.logout(context); // Call the parent's logout method
-                } else {
-                  print("Failed to find parent state for logout.");
-                }
-
+               logout(context);
                 // Implement logout functionality here
               },
             )

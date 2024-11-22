@@ -162,15 +162,15 @@ void _showOptionsModal(BuildContext context) {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.group_add_outlined),
-              title: const Text('친구요청'),
-              onTap:(){
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context)=>  NotificationsPage(senderUserId: '',)),
-                );
-              }
+                leading: const Icon(Icons.group_add_outlined),
+                title: const Text('친구요청'),
+                onTap:(){
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context)=>  NotificationsPage(currentUserId: '',)),
+                  );
+                }
             ),
 
             ListTile(

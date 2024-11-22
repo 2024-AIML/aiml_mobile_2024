@@ -1,53 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:aiml_mobile_2024/service/token_storage.dart';
+
 import '../service/FriendService.dart';
 
 class NotificationsPage extends StatefulWidget {
-  final String senderUserId;
+  final String currentUserId; // 현재 로그인한 사용자 ID
+  // final String senderUserId;
 
-  NotificationsPage({required this.senderUserId});
+  NotificationsPage({required this.currentUserId});
 
   @override
   _NotificationsPageState createState() => _NotificationsPageState();
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  String currentUserId = 'Unknown'; // 현재 로그인한 사용자 ID
-  String userName = 'Unknown';
-  String userPhone = 'No phone';
+  String currentUserName = '사용자 이름 없음';
 
   @override
   void initState() {
     super.initState();
-    fetchUserInfo();
+    _fetchCurrentUserName();
   }
 
-  Future<void> fetchUserInfo() async {
-    String? jwtToken = await getJwtToken();
+  Future<void> _fetchCurrentUserName() async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('USER_INFO')
+          .doc(widget.currentUserId)
+          .get();
 
-    if (jwtToken != null) {
-      final response = await http.get(
-        Uri.parse('http://3.38.101.112:8081/api/member/info'),
-        headers: {
-          'Authorization': 'Bearer $jwtToken',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        var userData = jsonDecode(response.body);
+      if (userDoc.exists && userDoc.data() != null) {
         setState(() {
-          currentUserId = userData['id'] ?? 'Unknown';
-          userName = userData['name'] ?? 'Unknown';
-          // userPhone = userData['phoneNum'] ?? 'No phone';
+          currentUserName = userDoc.get('name') ?? '사용자 이름 없음';
         });
-      } else {
-        print("Failed to load user info: ${response.statusCode}, ${response.body}");
       }
-    } else {
-      print("JWT Token is missing");
+    } catch (e) {
+      print('Error fetching current user name: $e');
     }
   }
 
@@ -55,35 +43,33 @@ class _NotificationsPageState extends State<NotificationsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications'),
+        title: Text('친구 신청 알림'),
         backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Colors.black),
       ),
       backgroundColor: Colors.white,
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('USER_INFO')
-            .doc(currentUserId)
-            .collection('notifications')
-            .doc('unchecked')
+            .doc(widget.currentUserId)
+            .collection('newNotification')
             .snapshots(),
-        builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           }
-          if (!snapshot.hasData || snapshot.data!.data() == null) {
-            return Center(child: Text('받은 알림이 없습니다.'));
-          }
-          Map<String, dynamic> uncheckedData = snapshot.data!.data() as Map<String, dynamic>;
-          if (uncheckedData.isEmpty) {
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return Center(child: Text('받은 알림이 없습니다.'));
           }
 
-          List<String> userIDs = uncheckedData.keys.toList();
+          List<DocumentSnapshot> notifications = snapshot.data!.docs;
 
           return ListView.builder(
-            itemCount: userIDs.length,
+            itemCount: notifications.length,
             itemBuilder: (context, index) {
-              String userID = userIDs[index];
+              DocumentSnapshot notification = notifications[index];
+              String userID = notification.id;
+
               return FutureBuilder(
                 future: FirebaseFirestore.instance.collection('USER_INFO').get(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> usersSnapshot) {
@@ -94,39 +80,69 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     return SizedBox();
                   }
 
-                  String userName = '사용자 이름 없음';
+                  String notificationUserName = '알 수 없는 사용자';
                   for (QueryDocumentSnapshot userDoc in usersSnapshot.data!.docs) {
                     if (userDoc.id == userID) {
-                      userName = userDoc.get('name') ?? '사용자 이름 없음';
+                      notificationUserName = userDoc.get('name') ?? '알 수 없는 사용자';
                       break;
                     }
                   }
 
-                  return Card(
-                    child: ListTile(
-                      title: Text('친구 이름: $userName'),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () async {
-                              FriendService friendService = FriendService();
-                              await friendService.acceptFriendRequest(userID, currentUserId, userName, context);
-                            },
-                            child: Text('친구 수락'),
-                          ),
-                          SizedBox(width: 8),
-                          ElevatedButton(
-                            onPressed: () async {
-                              FriendService friendService = FriendService();
-                              await friendService.rejectFriendRequest(userID, currentUserId, context);
-                            },
-                            child: Text('친구 거절'),
-                          ),
-                        ],
+                  return Container(
+                    margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    child: Card(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                        side: BorderSide(color: Colors.black, width: 1.0),
                       ),
-                      onTap: () {
-                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '$notificationUserName 님에게 친구 신청이 왔습니다.',
+                              style: TextStyle(fontSize: 10.0, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 8.0),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    FriendService friendService = FriendService();
+                                    await friendService.acceptFriendRequest(
+                                      userID, widget.currentUserId, currentUserName, context,
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.black,
+                                    foregroundColor: Colors.white,
+                                    padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                  ),
+                                  child: Text('친구 수락', style: TextStyle(fontSize: 8),),
+                                ),
+                                SizedBox(width: 8.0),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    FriendService friendService = FriendService();
+                                    await friendService.rejectFriendRequest(
+                                      userID, widget.currentUserId, currentUserName, context,
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.black, // 버튼 배경색
+                                    foregroundColor: Colors.white,
+                                    padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                  ),
+                                  child: Text('친구 거절', style: TextStyle(fontSize: 8),),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   );
                 },

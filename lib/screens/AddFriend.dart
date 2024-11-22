@@ -22,7 +22,7 @@ class _AddFriendState extends State<AddFriend> {
 
     if (jwtToken != null) {
       final response = await http.get(
-        Uri.parse('http://3.38.101.112:8081/api/member/info'),
+        Uri.parse('http://54.180.158.5:8081/api/member/info'),
         headers: {
           'Authorization': 'Bearer $jwtToken',
         },
@@ -32,8 +32,8 @@ class _AddFriendState extends State<AddFriend> {
         var userData = jsonDecode(response.body);
         setState(() {
           userId = userData['id'] ?? 'Unknown';
-          userName = userData['name'] ?? 'Unknown'; // name이 null이면 'Unknown'
-          userPhone = userData['phoneNum'] ?? 'No phone';
+          userName = userData['name'] ?? 'Unknown';
+          userPhone = userData['phoneNum'] ?? 'Unknown';
         });
       } else {
         print("Failed to load user info: ${response.statusCode}, ${response.body}");
@@ -46,7 +46,7 @@ class _AddFriendState extends State<AddFriend> {
   @override
   void initState() {
     super.initState();
-    fetchUserInfo(); // 화면이 로드될 때 사용자 정보 가져오기
+    fetchUserInfo();
   }
 
   Future<List<DocumentSnapshot>> searchUsers(String searchQuery) async {
@@ -94,20 +94,21 @@ class _AddFriendState extends State<AddFriend> {
   Future<void> sendFriendRequest(BuildContext context, String currentUserId, String friendUserId) async {
     try {
       DocumentReference friendDocRef = FirebaseFirestore.instance.collection('USER_INFO').doc(friendUserId);
-      CollectionReference notificationRef = friendDocRef.collection('notification');
+      CollectionReference notificationRef = friendDocRef.collection('newNotification');
 
-      await notificationRef.add({
+      // senderId (currentUserId)를 newNotification 컬렉션의 문서 ID로 사용
+      await notificationRef.doc(currentUserId).set({
         'senderId': currentUserId,
+        'type': 'friend_request',
         'timestamp': FieldValue.serverTimestamp(),
-        'type': 'friend_request'
       });
 
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: Colors.white,
-          title: Text('친구 요청 성공', style: TextStyle(color: Colors.black)),
-          content: Text('친구 요청을 성공적으로 보냈습니다.'),
+          title: Text('친구 요청 성공', style: TextStyle(color: Colors.black, fontSize: 13)),
+          content: Text('친구 요청을 성공적으로 보냈습니다.', style: TextStyle(fontSize: 10),),
           actions: [
             TextButton(
               onPressed: () {
@@ -140,11 +141,11 @@ class _AddFriendState extends State<AddFriend> {
             TextField(
               controller: _controller,
               decoration: InputDecoration(
-                labelText: '추가하고 싶은 사람의 정보를 입력하세요.',
+                labelText: '추가하고 싶은 사람의 정보를 입력하세요',
                 labelStyle: TextStyle(color: Colors.black),
                 hintText: '상대방의 전화번호, 이름, 이메일 중 하나를 입력하세요',
                 focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green[900]!)),
+                    borderSide: BorderSide(color: Colors.black)),
               ),
             ),
             SizedBox(height: 20),
@@ -161,8 +162,8 @@ class _AddFriendState extends State<AddFriend> {
                     context: context,
                     builder: (context) => AlertDialog(
                       backgroundColor: Colors.white,
-                      title: Text('검색 결과', style: TextStyle(color: Colors.black)),
-                      content: Text('일치하는 사용자가 없습니다.', style: TextStyle(color: Colors.black)),
+                      title: Text('검색 결과', style: TextStyle(color: Colors.black, fontSize: 13)),
+                      content: Text('일치하는 사용자가 없습니다.', style: TextStyle(color: Colors.black, fontSize: 10)),
                       actions: [
                         TextButton(
                           onPressed: () {
@@ -178,7 +179,7 @@ class _AddFriendState extends State<AddFriend> {
                     context: context,
                     builder: (context) => AlertDialog(
                       backgroundColor: Colors.white,
-                      title: Text('검색 결과', style: TextStyle(color: Colors.black, fontSize: 18)),
+                      title: Text('검색 결과', style: TextStyle(color: Colors.black, fontSize: 13)),
                       content: Container(
                         color: Colors.white,
                         width: double.maxFinite,
@@ -202,33 +203,52 @@ class _AddFriendState extends State<AddFriend> {
                                 child: ListTile(
                                   title: Text(
                                     '이름: ${userData['name']}',
-                                    style: TextStyle(color: Colors.black),
+                                    style: TextStyle(color: Colors.black, fontSize: 10),
                                   ),
                                   subtitle: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         '전화번호: ${maskPhoneNumber(userData['phoneNum'] ?? '')}',
-                                        style: TextStyle(color: Colors.black),
+                                        style: TextStyle(color: Colors.black, fontSize: 10),
                                       ),
                                       Text(
                                         '이메일: ${maskEmail(userData['email'] ?? '')}',
-                                        style: TextStyle(color: Colors.black),
+                                        style: TextStyle(color: Colors.black, fontSize: 10),
                                       ),
                                     ],
                                   ),
-                                  trailing: ElevatedButton(
-                                    onPressed: () async {
-                                      String currentUserId = userId; // 현재 사용자 ID
-                                      await sendFriendRequest(context, currentUserId, friendUserId);
-                                      print('친구 요청을 보냈습니다: ${userData['name']}');
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.black,
-                                    ),
-                                    child: Text(
-                                      '친구 신청',
-                                      style: TextStyle(color: Colors.white),
+                                  // trailing: ElevatedButton(
+                                  //   onPressed: () async {
+                                  //     String currentUserId = userId; // 현재 사용자 ID
+                                  //     await sendFriendRequest(context, currentUserId, friendUserId);
+                                  //     print('친구 요청을 보냈습니다: ${userData['name']}');
+                                  //   },
+                                  //   style: ElevatedButton.styleFrom(
+                                  //     backgroundColor: Colors.black,
+                                  //   ),
+                                  //   child: Text(
+                                  //     '친구 신청',
+                                  //     style: TextStyle(color: Colors.white, fontSize: 8),
+                                  //   ),
+                                  // ),
+                                  trailing: SizedBox(
+                                    width: 40,
+                                    height : 15,
+                                    child: ElevatedButton(
+                                      onPressed: () async{
+                                        String currentUserId = userId;
+                                        await sendFriendRequest(context, currentUserId, friendUserId);
+                                        print("친구 요청을 보냈습니다. ${userData['name']}");
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.black,
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                      child: Text(
+                                        '친구 신청',
+                                        style: TextStyle(color: Colors.white, fontSize: 8),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -256,11 +276,11 @@ class _AddFriendState extends State<AddFriend> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => NotificationsPage(senderUserId: '')),
+            MaterialPageRoute(builder: (context) => NotificationsPage(currentUserId: '',)),
           );
         },
         child: Icon(Icons.notifications, color: Colors.white),
-        tooltip: 'Notifications',
+        tooltip: '알림',
         backgroundColor: Colors.black,
       ),
     );

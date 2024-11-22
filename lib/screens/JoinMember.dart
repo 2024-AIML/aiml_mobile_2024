@@ -17,7 +17,7 @@ class _JoinMemberState extends State<JoinMember> {
 
 
   Future<void> _Join(String id, String password, String name, String phoneNum) async {
-    final url = Uri.parse('http://3.38.101.112:8081/api/member');
+    final url = Uri.parse('http://54.180.158.5:8081/api/member');
 
     final response = await http.post(
       url,

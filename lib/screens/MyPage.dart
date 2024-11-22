@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:aiml_mobile_2024/service/token_storage.dart';
-import 'package:aiml_mobile_2024/widget/CommonScaffold.dart';
 import 'package:aiml_mobile_2024/screens/HomeScreen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -53,7 +52,7 @@ class _MyPageState extends State<MyPage> {
 
     if (jwtToken != null) {
       final response = await http.get(
-        Uri.parse('http://3.38.101.112:8081/api/member/info'),
+        Uri.parse('http://54.180.158.5:8081/api/member/info'),
         headers: {
           'Authorization': 'Bearer $jwtToken',
         },
@@ -122,7 +121,7 @@ class _MyPageState extends State<MyPage> {
       String? jwtToken = await getJwtToken();
 
       final response = await http.post(
-        Uri.parse('http://3.38.101.112:8081/geocoding/userlocation'),
+        Uri.parse('http://54.180.158.5:8081/geocoding/userlocation'),
         headers: {
           'Authorization': 'Bearer $jwtToken',
           'Content-Type': 'application/json',
@@ -148,7 +147,7 @@ class _MyPageState extends State<MyPage> {
 
     if (jwtToken != null) {
       final response = await http.post(
-        Uri.parse('http://3.38.101.112:8081/logout'),
+        Uri.parse('http://54.180.158.5:8081/logout'),
         headers: {
           'Authorization': 'Bearer $jwtToken',
         },
