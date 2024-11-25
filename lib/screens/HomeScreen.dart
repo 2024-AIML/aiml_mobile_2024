@@ -168,7 +168,7 @@ void _showOptionsModal(BuildContext context) {
                   Navigator.pop(context);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context)=>  NotificationsPage(currentUserId: '',)),
+                    MaterialPageRoute(builder: (context)=>  NotificationsPage()),
                   );
                 }
             ),

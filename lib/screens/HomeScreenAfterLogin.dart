@@ -13,10 +13,13 @@ import 'AddFriend.dart';
 import 'FriendsNotification.dart';
 import 'Guidelines.dart';
 import 'MorseCode.dart';
-import 'MyPage.dart';
-import 'InfraLocation.dart';
 import 'package:aiml_mobile_2024/service/token_storage.dart';
 import 'package:aiml_mobile_2024/service/LogOut.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
+import 'package:aiml_mobile_2024/service/InfraInfoService.dart';
 
 
 
@@ -126,20 +129,29 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
   List<Map<String, dynamic>> posts = [];
   String userName = '';
   final List<Color> cardColors = [Colors.blue[50]!, Colors.green[50]!, Colors.pink[50]!];
+  List _hospitals = [];
+  List _pharmacies = [];
+  List<NMarker> markers = [];
+  Position? _currentPosition;
+  NaverMapController? _controller;
+  String? selectedLocation = '병원';
+  bool showList = false;
 
   @override
   void initState() {
   super.initState();
   fetchPosts();
   fetchUserInfo();
-
+  _getCurrentLocation();
+  _fetchHospitals();
+  _fetchPharmacies();
 }
 
   Future<void> fetchUserInfo() async {
     String? jwtToken = await getJwtToken();
     if (jwtToken != null) {
       final response = await http.get(
-        Uri.parse('http://54.180.158.5:8081/api/member/info'),
+        Uri.parse('http://3.36.69.187:8081/api/member/info'),
         headers: {
           'Authorization': 'Bearer $jwtToken',
         },
@@ -160,7 +172,7 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
 
   Future<void> fetchPosts() async {
     try{
-      final response = await http.get(Uri.parse('http://54.180.158.5:8081/post/'));
+      final response = await http.get(Uri.parse('http://3.36.69.187:8081/post/'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -184,6 +196,92 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
         {'title': '아 배고프다', 'content': '우리집 통조림 다 떨어졌는데 통조림 나눔 좀 해주세요'},];
     });}}
 
+  Future<void> _fetchHospitals() async {
+    if (_currentPosition != null) {
+      try {
+        final data = await InfraInfoService.fetchHospitals(_currentPosition!.latitude, _currentPosition!.longitude);
+        setState(() {
+          _hospitals = data;
+        });
+        _updateMarkers();
+      } catch (e) {
+        print('Error fetching hospitals: $e');
+      }
+    }
+  }
+
+  Future<void> _fetchPharmacies() async {
+    if (_currentPosition != null) {
+      try {
+        final data = await InfraInfoService.fetchPharmacies(_currentPosition!.latitude, _currentPosition!.longitude);
+        setState(() {
+          _pharmacies = data;
+        });
+        _updateMarkers();
+      } catch (e) {
+        print('Error fetching pharmacies: $e');
+      }
+    }
+  }
+
+  void _updateMarkers() {
+    setState(() {
+      markers = [];
+      List<NMarker> newMarkers = [];
+
+      if (selectedLocation == '병원') {
+        newMarkers = _hospitals.map((hospital) {
+          final NMarker marker = NMarker(
+            id: hospital.name,
+            position: NLatLng(hospital.latitude, hospital.longitude),
+          );
+          marker.setOnTapListener((NMarker tappedMarker) {
+            String url = 'nmap://route/walk?...'; // Fill with proper parameters
+            launch(url);
+          });
+          return marker;
+        }).toList();
+      } else if (selectedLocation == '약국') {
+        newMarkers = _pharmacies.map((pharmacy) {
+          final NMarker marker = NMarker(
+            id: pharmacy.name,
+            position: NLatLng(pharmacy.latitude, pharmacy.longitude),
+          );
+          marker.setOnTapListener((NMarker tappedMarker) {
+            String url = 'nmap://route/walk?...'; // Fill with proper parameters
+            launch(url);
+          });
+          return marker;
+        }).toList();
+      }
+
+      if (_controller != null) {
+        _controller!.clearOverlays().then((_) {
+          markers = newMarkers;
+          for (var marker in markers) {
+            _controller!.addOverlay(marker).catchError((e) {
+              print('Error adding marker: $e');
+            });
+          }
+        }).catchError((e) {
+          print('Error clearing overlays: $e');
+        });
+      }
+    });
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        _currentPosition = position;
+      });
+      _fetchHospitals();
+      _fetchPharmacies();
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
 
     @override
   Widget build(BuildContext context) {
@@ -336,7 +434,157 @@ class _HomeScreenAfterLoginState extends State<HomeScreenAfterLogin> {
             height: 400.0,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: InfraScreen(),
+              child: Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Stack(
+                        children: [
+                          if (_currentPosition != null)
+                            NaverMap(
+                              options: NaverMapViewOptions(
+                                initialCameraPosition: NCameraPosition(
+                                  target: NLatLng(
+                                    _currentPosition!.latitude,
+                                    _currentPosition!.longitude,
+                                  ),
+                                  zoom: 14,
+                                ),
+                              ),
+                              onMapReady: (controller) {
+                                setState(() {
+                                  _controller = controller;
+                                });
+                              },
+                              onMapTapped: (point, latLng) {
+                                setState(() {
+                                  showList = false; // Hide the list when map is tapped
+                                });
+                              },
+                            ),
+                          Positioned(
+                            top: 20,
+                            left: 20,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  selectedLocation = '병원';
+                                  showList = true;
+                                  _updateMarkers();
+                                });
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.local_hospital,
+                                    color: Colors.red,
+                                    size: 25,
+                                  ),
+                                  Text(
+                                    '병원',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 20,
+                            left: 140,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  selectedLocation = '약국';
+                                  showList = true;
+                                  _updateMarkers();
+                                });
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.medication_liquid,
+                                    color: Colors.teal,
+                                    size: 25,
+                                  ),
+                                  Text(
+                                    '약국',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (showList)
+                      Expanded(
+                        child: selectedLocation == '병원'
+                            ? ListView.builder(
+                          itemCount: _hospitals.length,
+                          itemBuilder: (context, index) {
+                            final hospital = _hospitals[index];
+                            return InkWell(
+                              onTap: () async {
+                                final String hospitalName = Uri.encodeComponent(hospital.name);
+                                final String url =
+                                    'nmap://route/walk?slat=${_currentPosition!.latitude}&slng=${_currentPosition!.longitude}&sname=현재위치&dlat=${hospital.latitude}&dlng=${hospital.longitude}&dname=$hospitalName&appname=com.example.aiml_mobile_2024';
+                                final Uri uri = Uri.parse(url);
+
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(uri);
+                                } else {
+                                  print('Could not launch $url');
+                                }
+                              },
+                              child: ListTile(
+                                title: Text(hospital.name),
+                                subtitle: Text(
+                                  '${hospital.distance?.toStringAsFixed(2)} km',
+                                ),
+                              ),
+                            );
+                          },
+                        )
+                            : ListView.builder(
+                          itemCount: _pharmacies.length,
+                          itemBuilder: (context, index) {
+                            final pharmacy = _pharmacies[index];
+                            return InkWell(
+                              onTap: () async {
+                                final String pharmacyName = Uri.encodeComponent(pharmacy.name);
+                                final String url =
+                                    'nmap://route/walk?slat=${_currentPosition!.latitude}&slng=${_currentPosition!.longitude}&sname=현재위치&dlat=${pharmacy.latitude}&dlng=${pharmacy.longitude}&dname=$pharmacyName&appname=com.example.aiml_mobile_2024';
+                                final Uri uri = Uri.parse(url);
+
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(uri);
+                                } else {
+                                  print('Could not launch $url');
+                                }
+                              },
+                              child: ListTile(
+                                title: Text(pharmacy.name),
+                                subtitle: Text(
+                                  '${pharmacy.distance?.toStringAsFixed(2)} km',
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ),
           ),
 
@@ -476,9 +724,7 @@ void _showOptionsModal(BuildContext context) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => NotificationsPage(
-                      currentUserId: '',
-                    ),
+                    builder: (context) => NotificationsPage(),
                   ),
                 );
               },

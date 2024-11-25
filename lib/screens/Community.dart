@@ -29,7 +29,7 @@ class _CommunityState extends State<Community> {
   // Post 데이터를 가져오는 함수
   Future<void> fetchPosts() async {
     try{
-      final response = await http.get(Uri.parse('http://3.38.101.112:8081/post/'));
+      final response = await http.get(Uri.parse('http://3.36.69.187:8081/post/'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));

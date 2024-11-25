@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:aiml_mobile_2024/screens/AddFriend.dart';
+import 'package:aiml_mobile_2024/service/token_storage.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class FriendLocation extends StatefulWidget {
   @override
@@ -12,63 +14,16 @@ class FriendLocation extends StatefulWidget {
 }
 
 class _FriendLocationState extends State<FriendLocation> {
-  List<Map<String, dynamic>> defaultFriends = [
-    {
-      'name': 'Hong',
-      'phoneNum': '010-1234-5678',
-      'latitude': 37.5563,
-      'longitude': 126.9239,
-    },
-    {
-      'name': 'Pae',
-      'phoneNum': '010-2345-6789',
-      'latitude': 37.5580, // 변경
-      'longitude': 126.9260, // 변경
-    },
-    {
-      'name': 'Yoon',
-      'phoneNum': '010-3456-7890',
-      'latitude': 37.5540, // 변경
-      'longitude': 126.9220, // 변경
-    },
-    {
-      'name': 'Na',
-      'phoneNum': '010-4567-8901',
-      'latitude': 37.5600, // 변경
-      'longitude': 126.9200, // 변경
-    },
-    {
-      'name': 'Ko',
-      'phoneNum': '010-5678-9012',
-      'latitude': 37.5520, // 변경
-      'longitude': 126.9280, // 변경
-    },
-  ];
-
-
-  TextEditingController searchController = TextEditingController();
   Position? _currentPosition;
   NaverMapController? _mapController;
+  String userId = '';
+  List<Map<String, dynamic>> friendsWithLocation = [];
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
-  }
-
-  Future<List<DocumentSnapshot>> _fetchFriendList() async {
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('USER_INFO')
-          .doc('현재 사용자 ID') // Replace with the logged-in user's ID
-          .collection('friends')
-          .get();
-
-      return querySnapshot.docs;
-    } catch (e) {
-      print('Error fetching friend list: $e');
-      return [];
-    }
+    fetchUserInfo();
   }
 
   Future<void> _getCurrentLocation() async {
@@ -84,6 +39,135 @@ class _FriendLocationState extends State<FriendLocation> {
     }
   }
 
+  Future<void> fetchUserInfo() async {
+    String? jwtToken = await getJwtToken();
+
+    if (jwtToken != null) {
+      final response = await http.get(
+        Uri.parse('http://3.36.69.187:8081/api/member/info'),
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var userData = jsonDecode(response.body);
+        setState(() {
+          userId = userData['id'] ?? 'Unknown';
+        });
+        fetchFriendNamesWithLocation();
+      } else {
+        print("사용자 정보 로딩 실패: ${response.statusCode}, ${response.body}");
+      }
+    } else {
+      print("JWT 토큰이 없습니다.");
+    }
+  }
+
+  Future<void> fetchFriendNamesWithLocation() async {
+    try {
+      QuerySnapshot friendsSnapshot = await FirebaseFirestore.instance
+          .collection('USER_INFO')
+          .doc(userId)
+          .collection('friends')
+          .get();
+
+      List<Map<String, dynamic>> friendData = [];
+      for (var friendDoc in friendsSnapshot.docs) {
+        String friendId = friendDoc.id;
+        String friendName = await fetchSenderName(friendId);
+
+        // Fetch location data from USER_LOCATION
+        DocumentSnapshot locationDoc = await FirebaseFirestore.instance
+            .collection('USER_LOCATION')
+            .doc(friendId)
+            .get();
+
+        double latitude = (locationDoc['latitude'] is String)
+            ? double.tryParse(locationDoc['latitude']) ?? 0.0
+            : locationDoc['latitude'] as double? ?? 0.0;
+
+        double longitude = (locationDoc['longitude'] is String)
+            ? double.tryParse(locationDoc['longitude']) ?? 0.0
+            : locationDoc['longitude'] as double? ?? 0.0;
+
+        friendData.add({
+          'name': friendName,
+          'latitude': latitude,
+          'longitude': longitude,
+        });
+      }
+
+      setState(() {
+        friendsWithLocation = friendData;
+      });
+
+      _addFriendMarkers();
+    } catch (e) {
+      print('Error fetching friend names and locations: $e');
+    }
+  }
+
+  Future<String> fetchSenderName(String senderId) async {
+    try {
+      DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+          .collection('USER_INFO')
+          .doc(senderId)
+          .get();
+
+      if (documentSnapshot.exists) {
+        final data = documentSnapshot.data() as Map<String, dynamic>?;
+        return data?['name'] ?? '알 수 없는 사용자';
+      } else {
+        return '알 수 없는 사용자';
+      }
+    } catch (e) {
+      print('Error fetching sender Name: $e');
+      return '알 수 없는 사용자';
+    }
+  }
+
+  void _addFriendMarkers() {
+    if (_mapController != null && friendsWithLocation.isNotEmpty) {
+      for (var friend in friendsWithLocation) {
+        double latitude = friend['latitude'];
+        double longitude = friend['longitude'];
+        String name = friend['name'];
+
+        final friendMarker = NMarker(
+          id: 'friend_marker_${latitude}_${longitude}',
+          position: NLatLng(latitude, longitude),
+          caption: NOverlayCaption(
+            text: name,
+            textSize: 20,
+            color: Colors.green[700]!,
+          ),
+        );
+
+        friendMarker.setOnTapListener((overlay) async {
+          if (_currentPosition != null) {
+            double currentLat = _currentPosition!.latitude;
+            double currentLng = _currentPosition!.longitude;
+
+            final Uri routeUrl = Uri.parse(
+              'nmap://route/walk?slat=$currentLat&slng=$currentLng&sname=%EC%97%AC%EA%B8%B0%20%EC%9E%90%EB%A6%AC&dlat=$latitude&dlng=$longitude&dname=$name&appname=com.example.my_app',
+            );
+
+            if (await canLaunchUrl(routeUrl)) {
+              await launchUrl(routeUrl);
+            } else {
+              print('Could not launch $routeUrl');
+            }
+          } else {
+            print('Current position is null');
+          }
+        });
+
+        _mapController!.addOverlay(friendMarker);
+      }
+    }
+  }
+
   void _moveToFriendLocation(double latitude, double longitude, String name) {
     if (_mapController != null) {
       _mapController!.updateCamera(
@@ -91,52 +175,8 @@ class _FriendLocationState extends State<FriendLocation> {
           target: NLatLng(latitude, longitude),
         ),
       );
-
-      // 마커 생성
-      final friendMarker = NMarker(
-        id: 'friend_marker_${latitude}_${longitude}', // 고유 ID
-        position: NLatLng(latitude, longitude),
-        caption: NOverlayCaption( // 캡션 설정
-          text: name, // 캡션에 표시할 이름
-          textSize: 20, // 캡션 텍스트 크기
-          color: Colors.green[700]!, // 캡션 텍스트 색상
-
-
-        ),
-      );
-
-      // 마커 클릭 리스너 추가
-      friendMarker.setOnTapListener((overlay) async {
-        if (_currentPosition != null) {
-          double currentLat = _currentPosition!.latitude;
-          double currentLng = _currentPosition!.longitude;
-
-          // 네이버 지도 URL 생성
-          final Uri routeUrl = Uri.parse(
-            'nmap://route/walk?slat=$currentLat&slng=$currentLng&sname=%EC%97%AC%EA%B8%B0%20%EC%9E%90%EB%A6%AC&dlat=$latitude&dlng=$longitude&dname=$name&appname=com.example.my_app',
-          );
-
-          // URL 실행
-          if (await canLaunchUrl(routeUrl)) {
-            await launchUrl(routeUrl);
-          } else {
-            print('Could not launch $routeUrl');
-          }
-        } else {
-          print('Current position is null');
-        }
-      });
-
-      // 마커 지도에 추가
-      setState(() {
-        _mapController!.addOverlay(friendMarker);
-      });
     }
   }
-
-
-
-
 
   void _showAddFriendDialog(BuildContext context) {
     Navigator.push(
@@ -150,10 +190,8 @@ class _FriendLocationState extends State<FriendLocation> {
     return Scaffold(
       body: Column(
         children: [
-          // 상단 친구 추가 버튼 및 제목
           Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -174,14 +212,9 @@ class _FriendLocationState extends State<FriendLocation> {
               ],
             ),
           ),
-
-          // 지도 영역
           if (_currentPosition != null)
             Container(
-              height: MediaQuery
-                  .of(context)
-                  .size
-                  .height * 0.4,
+              height: MediaQuery.of(context).size.height * 0.4,
               child: NaverMap(
                 options: NaverMapViewOptions(
                   initialCameraPosition: NCameraPosition(
@@ -201,78 +234,45 @@ class _FriendLocationState extends State<FriendLocation> {
             )
           else
             Container(
-              height: MediaQuery
-                  .of(context)
-                  .size
-                  .height * 0.4,
+              height: MediaQuery.of(context).size.height * 0.4,
               child: Center(child: CircularProgressIndicator()),
             ),
-
-          // 친구 목록
           Expanded(
-            child: FutureBuilder(
-              future: _fetchFriendList(),
-              builder: (context,
-                  AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
+            child: ListView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              itemCount: friendsWithLocation.length,
+              itemBuilder: (context, index) {
+                var friend = friendsWithLocation[index];
+                String friendName = friend['name'];
+                double latitude = friend['latitude'];
+                double longitude = friend['longitude'];
 
-                List<Map<String, dynamic>> friends = [];
-                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                  friends = snapshot.data!
-                      .map((doc) => doc.data() as Map<String, dynamic>)
-                      .toList();
-                } else {
-                  friends = defaultFriends;
-                }
+                return Container(
+                  margin: EdgeInsets.only(bottom: 8.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    color: Colors.white,
+                    border: Border.all(color: Colors.green, width: 2.0),
+                  ),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 4.0),
+                    leading: Icon(Icons.person, color: Colors.green, size: 24.0),
+                    title: Text(
+                      friendName,
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
 
-                return ListView.builder(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 12.0, vertical: 8.0),
-                  itemCount: friends.length,
-                  itemBuilder: (context, index) {
-                    Map<String, dynamic> friendData = friends[index];
-                    return Container(
-                      margin: EdgeInsets.only(bottom: 8.0), // 항목 간 간격
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        color: Colors.white,
-                        border: Border.all(color:Colors.green,width:2.0)
-                      ),
-                      child: ListTile(
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 12.0, vertical: 4.0),
-                        // 타일 크기 조정
-                        leading:  Icon(
-                              Icons.person, color: Colors.green, size: 24.0),
-                        title: Text(
-                          friendData['name'] ?? '이름 없음',
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        subtitle: Text(
-                          friendData['phoneNum'] ?? '연락처 없음',
-                          style: TextStyle(
-                            fontSize: 12.0,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        trailing: Icon(Icons.arrow_forward_ios,
-                            color: Colors.grey, size: 16.0),
-                        onTap: () {
-                          double latitude = friendData['latitude'];
-                          double longitude = friendData['longitude'];
-                          String friendName = friendData['name'];
-                          _moveToFriendLocation(
-                              latitude, longitude, friendName);
-                        },
-                      ),
-                    );
-                  },
+                    trailing: Icon(Icons.arrow_forward_ios,
+                        color: Colors.grey, size: 16.0),
+                    onTap: () {
+                      _moveToFriendLocation(latitude, longitude, friendName);
+                    },
+                  ),
                 );
               },
             ),

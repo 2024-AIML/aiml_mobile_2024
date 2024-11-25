@@ -9,7 +9,7 @@ Future<void> logout(BuildContext context) async {
 
   if (jwtToken != null) {
     final response = await http.post(
-      Uri.parse('http://54.180.158.5:8081/logout'),
+      Uri.parse('http://3.36.69.187:8081/logout'),
       headers: {
         'Authorization': 'Bearer $jwtToken',
       },

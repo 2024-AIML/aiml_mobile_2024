@@ -238,22 +238,22 @@ class _InfraScreenState extends State<InfraScreen> {
                   final hospital = _hospitals[index];
                   return InkWell(
                       onTap: () async {
-                    final String hospitalName = Uri.encodeComponent(hospital.name);
-                    final String url = 'nmap://route/walk?slat=${_currentPosition!.latitude}&slng=${_currentPosition!.longitude}&sname=현재위치&dlat=${hospital.latitude}&dlng=${hospital.longitude}&dname=$hospitalName&appname=com.example.aiml_mobile_2024';
-                    final Uri uri = Uri.parse(url);
+                        final String hospitalName = Uri.encodeComponent(hospital.name);
+                        final String url = 'nmap://route/walk?slat=${_currentPosition!.latitude}&slng=${_currentPosition!.longitude}&sname=현재위치&dlat=${hospital.latitude}&dlng=${hospital.longitude}&dname=$hospitalName&appname=com.example.aiml_mobile_2024';
+                        final Uri uri = Uri.parse(url);
 
-                    if (await canLaunchUrl(uri)) {
-                  await launchUrl(uri);
-                  } else {
-                  print('Could not launch $url');
-                  }
-                  },
-                  child: ListTile(
-                    title: Text(_hospitals[index].name),
-                    subtitle: Text(
-                      '${_hospitals[index].distance?.toStringAsFixed(2)} km',
-                    ),
-                  )
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri);
+                        } else {
+                          print('Could not launch $url');
+                        }
+                      },
+                      child: ListTile(
+                        title: Text(_hospitals[index].name),
+                        subtitle: Text(
+                          '${_hospitals[index].distance?.toStringAsFixed(2)} km',
+                        ),
+                      )
                   );
                 },
               )
@@ -268,18 +268,18 @@ class _InfraScreenState extends State<InfraScreen> {
                         final String url = 'nmap://route/walk?slat=${_currentPosition!.latitude}&slng=${_currentPosition!.longitude}&sname=현재위치&dlat=${pharmacy.latitude}&dlng=${pharmacy.longitude}&dname=$hospitalName&appname=com.example.aiml_mobile_2024';
                         final Uri uri = Uri.parse(url);
 
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri);
-                      } else {
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri);
+                        } else {
                           print('Could not launch $url');
-                          }
-                        },
-                    child:ListTile(
-                      title: Text(_pharmacies[index].name),
-                      subtitle: Text (
-                      '${_pharmacies[index].distance?.toStringAsFixed(2)} km',
-                    ),
-                  )
+                        }
+                      },
+                      child:ListTile(
+                        title: Text(_pharmacies[index].name),
+                        subtitle: Text (
+                          '${_pharmacies[index].distance?.toStringAsFixed(2)} km',
+                        ),
+                      )
                   );
                 },
               ),
